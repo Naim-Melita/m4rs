@@ -1,11 +1,46 @@
-import React from "react";
-import "./styles/global.css";
+import { useEffect, useState } from "react";
+import "./App.css";
 
 export default function App() {
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > window.innerHeight - 80) {
+        setScrolled(true);
+      } else {
+        setScrolled(false);
+      }
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
-    <header className="header">
-      <h1 className="brand">M4RS</h1>
-      <p className="tagline">LO RARO SE VOLVIÓ ESTILO</p>
-    </header>
+    <>
+      {/* Header */}
+      
+      <header className={`header ${scrolled ? "show" : ""}`}>
+        
+        <div className="logo">M4RS</div>
+      </header>
+
+      {/* Hero */}
+      <section className="hero">
+        <div className="overlay"></div>
+        <div className={`hero-logo ${scrolled ? "to-header" : ""}`}>M4RS</div>
+        <div className={`hero-subtitle ${scrolled ? "fade-out" : ""}`}>
+          LO RARO SE VOLVIÓ ESTILO
+        </div>
+      </section>
+
+      {/* Contenido */}
+      <main>
+        <div style={{ height: "200vh", padding: "2rem" }}>
+          <h2>Contenido de la página</h2>
+          <p>Scroll para ver la animación...</p>
+        </div>
+      </main>
+    </>
   );
 }
