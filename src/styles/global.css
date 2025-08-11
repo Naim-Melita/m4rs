@@ -1,0 +1,40 @@
+/* styles.css */
+@font-face {
+  font-family: "NohemiVar";
+  src: url("/fonts/Nohemi-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+}
+
+body {
+  margin: 0;
+  font-family: "NohemiVar", sans-serif;
+  background-color: #f2f2f2; /* como el fondo del PDF */
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 120px;
+  background-color: #f2f2f2;
+  text-align: center;
+}
+
+.brand {
+  font-size: 3rem;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  color: #000000;
+  margin: 0;
+  line-height: 1;
+}
+
+.tagline {
+  font-size: 0.9rem;
+  letter-spacing: 0.3em; /* más espaciado */
+  color: #4d4d4d;
+  text-transform: uppercase;
+  margin: 4px 0 0;
+}
