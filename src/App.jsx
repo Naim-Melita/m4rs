@@ -19,10 +19,13 @@ export default function App() {
   return (
     <>
       {/* Header */}
-      
       <header className={`header ${scrolled ? "show" : ""}`}>
-        
         <div className="logo">M4RS</div>
+        <div className="header-right">
+          <span className="icon">🔍</span>
+          <span className="icon">🛒</span>
+          <span className="icon">☰</span>
+        </div>
       </header>
 
       {/* Hero */}
