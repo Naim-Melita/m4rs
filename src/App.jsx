@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
 import "./App.css";
+import './index.css'
+import Novedades from "./components/novedades";
+import { productos } from "./data";
 
 export default function App() {
   const [scrolled, setScrolled] = useState(false);
@@ -39,10 +42,14 @@ export default function App() {
 
       {/* Contenido */}
       <main>
-        <div style={{ height: "200vh", padding: "2rem" }}>
+        <div style={{ height: "100vh", padding: "2rem" }}>
           <h2>Contenido de la página</h2>
           <p>Scroll para ver la animación...</p>
+            {/* Sección de Novedades */}
+        <Novedades productos={productos} />
         </div>
+
+      
       </main>
     </>
   );
