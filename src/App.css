@@ -13,28 +13,46 @@ body {
   height: 60px;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between; /* cambia a space-between */
   background: white;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   z-index: 1000;
   transform: translateY(-100%);
   transition: transform 0.5s ease;
+  padding: 0 20px; /* agrega padding a los lados */
 }
 
 .header.show {
   transform: translateY(0);
 }
 
+/* LOGO centrado visualmente */
 .logo {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   font-size: 1.5rem;
   font-weight: bold;
+ color: black;
+}
+
+/* contenedor para iconos de la derecha */
+.header-icons {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.header-icons i {
+  font-size: 1.2rem;
+  cursor: pointer;
 }
 
 /* HERO */
 .hero {
   position: relative;
   height: 100vh;
-  background: url('/public/modelo2.png') center/cover no-repeat;
+  background: url('/modelo2.png') center/cover no-repeat;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -51,9 +69,9 @@ body {
   position: absolute;
   font-size: 6rem;
   font-weight: bold;
-  color: white;
   z-index: 1;
   transition: all 0.8s ease;
+  color: black;
 }
 
 .hero-logo.to-header {

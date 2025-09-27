@@ -1,4 +1,4 @@
-/* styles.css */
+/* === FUENTE === */
 @font-face {
   font-family: "NohemiVar";
   src: url("/fonts/Nohemi-Variable.woff2") format("woff2");
@@ -12,32 +12,98 @@ body {
   background-color: #f2f2f2; /* como el fondo del PDF */
 }
 
+/* === HEADER === */
 .header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: white;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  z-index: 1000;
+  transform: translateY(-100%);
+  transition: transform 0.5s ease;
+  padding: 0 20px;
+}
+
+.header.show {
+  transform: translateY(0);
+}
+
+.logo {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: black;
+}
+
+/* contenedor a la derecha */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.header-right .icon {
+  font-size: 1.3rem;
+  cursor: pointer;
+}
+
+/* === HERO === */
+.hero {
+  position: relative;
+  height: 100vh;
+  background: url('/modelo2.png') center/cover no-repeat;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 120px;
-  background-color: #f2f2f2;
-  text-align: center;
 }
 
-.brand {
-  font-size: 3rem;
-  font-weight: 900;
-  letter-spacing: 0.05em;
-  color: #000000;
-  margin: 0;
-  line-height: 1;
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
 }
 
-.tagline {
-  font-size: 0.9rem;
-  letter-spacing: 0.3em; /* más espaciado */
-  color: #4d4d4d;
-  text-transform: uppercase;
-  margin: 4px 0 0;
+.hero-logo {
+  position: absolute;
+  font-size: 6rem;
+  font-weight: bold;
+  color: white;
+  z-index: 1;
+  transition: all 0.8s ease;
 }
+
+.hero-logo.to-header {
+  top: 15px;
+  left: 50%;
+  transform: translateX(-50%) scale(0.5);
+  font-size: 2rem;
+  color: black;
+}
+
+.hero-subtitle {
+  position: relative;
+  font-size: 1.5rem;
+  letter-spacing: 4px;
+  color: white;
+  z-index: 1;
+  margin-top: 96px;
+  transition: opacity 0.5s ease;
+}
+
+.fade-out {
+  opacity: 0;
+}
+
+/* === GLITCH === */
 .glitch {
   position: relative;
   font-weight: bold;
@@ -73,7 +139,7 @@ body {
   animation: glitch-anim2 2.3s infinite linear alternate-reverse;
 }
 
-/* Animaciones de glitch */
+/* Animaciones glitch */
 @keyframes glitch-anim {
   0% { clip: rect(44px, 9999px, 56px, 0); transform: skew(0.5deg);}
   5% { clip: rect(12px, 9999px, 80px, 0); transform: skew(2deg);}
@@ -100,4 +166,12 @@ body {
   100% { transform: none; }
 }
 
+footer a {
+  color: #ccc;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
 
+footer a:hover {
+  color: #fff;
+}

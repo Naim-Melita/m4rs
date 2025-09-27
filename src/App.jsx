@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import GridIntro from "./components/Intro/Intro";
-import "./App.css";
+import "./index.css";
+import Novedades from "./components/novedades";
+import Footer from "./components/footer";
+import { productos } from "./data";
 
 export default function App() {
   const [scrolled, setScrolled] = useState(false);
@@ -31,6 +34,11 @@ export default function App() {
 
       <header className={`header ${scrolled ? "show" : ""}`}>
         <div className="logo">M4RS</div>
+        <div className="header-right">
+          <span className="icon">🔍</span>
+          <span className="icon">🛒</span>
+          <span className="icon">☰</span>
+        </div>
       </header>
 
       <section className="hero">
@@ -41,12 +49,19 @@ export default function App() {
         </div>
       </section>
 
-      <main className={`page-content ${scrolled ? "show" : ""}`}>
-        <div style={{ height: "200vh", padding: "2rem" }}>
-          <h2>Contenido de la pagina</h2>
-          <p>Scroll para ver la animacion...</p>
+      {/* Contenido principal */}
+      <main>
+        <div style={{ height: "100vh", padding: "2rem" }}>
+          <h2>Contenido de prueba</h2>
+          <p>Scroll para ver novedades...</p>
+             <Novedades productos={productos} />
         </div>
+
+      {/* Footer */}
+      <Footer />
       </main>
+
+     
     </>
   );
 }
