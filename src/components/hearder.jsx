@@ -26,10 +26,6 @@ export default function Header(){
         </div>
 
         <div style={{display:'flex', gap:10, alignItems:'center'}}>
-          <button style={{
-            padding:'8px 12px', borderRadius:8, border:'1px solid rgba(0,0,0,0.06)',
-            background:'white', cursor:'pointer'
-          }}>Descargar PDF</button>
           <div style={{width:40,height:40,borderRadius:8,background:'var(--light)',display:'flex',alignItems:'center',justifyContent:'center'}}>⚙️</div>
         </div>
       </div>
