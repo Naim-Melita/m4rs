@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import "./App.css";
-import './index.css'
-import Novedades from "./components/novedades";
+import "./index.css";
+import Novedades from "./components/Novedades";
+import Footer from "./components/footer";
 import { productos } from "./data";
 
 export default function App() {
@@ -40,17 +40,19 @@ export default function App() {
         </div>
       </section>
 
-      {/* Contenido */}
+      {/* Contenido principal */}
       <main>
         <div style={{ height: "100vh", padding: "2rem" }}>
-          <h2>Contenido de la página</h2>
-          <p>Scroll para ver la animación...</p>
-            {/* Sección de Novedades */}
-        <Novedades productos={productos} />
+          <h2>Contenido de prueba</h2>
+          <p>Scroll para ver novedades...</p>
+             <Novedades productos={productos} />
         </div>
 
-      
+      {/* Footer */}
+      <Footer />
       </main>
+
+     
     </>
   );
 }

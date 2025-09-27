@@ -164,3 +164,13 @@ body {
   60% { transform: skew(0.2deg); }
   100% { transform: none; }
 }
+
+footer a {
+  color: #ccc;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+footer a:hover {
+  color: #fff;
+}

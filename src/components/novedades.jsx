@@ -4,7 +4,7 @@ import "swiper/css";
 const Novedades = ({ productos }) => {
   return (
     <section className="max-w-7xl mx-auto px-4 py-10">
-      <h2 className="text-2xl font-bold mb-6 t text-center">Novedades</h2>
+      <h2 className="text-2xl font-bold mb-6 text-gray-500 text-center">Novedades</h2>
 
       <Swiper
         spaceBetween={30}
