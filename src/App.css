@@ -33,7 +33,7 @@ body {
   transform: translateX(-50%);
   font-size: 1.5rem;
   font-weight: bold;
-  color: black;
+ color: black;
 }
 
 /* contenedor para iconos de la derecha */
@@ -69,9 +69,9 @@ body {
   position: absolute;
   font-size: 6rem;
   font-weight: bold;
-  color: white;
   z-index: 1;
   transition: all 0.8s ease;
+  color: black;
 }
 
 .hero-logo.to-header {

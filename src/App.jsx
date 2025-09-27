@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import "./index.css";
-import Novedades from "./components/Novedades";
+import Novedades from "./components/novedades";
 import Footer from "./components/footer";
 import { productos } from "./data";
 
@@ -35,7 +35,7 @@ export default function App() {
       <section className="hero">
         <div className="overlay"></div>
         <div className={`hero-logo ${scrolled ? "to-header" : ""}`}>M4RS</div>
-        <div className={`hero-subtitle ${scrolled ? "fade-out" : ""}`}>
+        <div className=  {`hero-subtitle ${scrolled ? "fade-out" : ""}`}>
           LO RARO SE VOLVIÓ ESTILO
         </div>
       </section>

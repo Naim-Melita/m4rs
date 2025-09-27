@@ -9,10 +9,7 @@ export default function Header(){
           width:52, height:52, borderRadius:12, background:'var(--black)',
           display:'flex',alignItems:'center',justifyContent:'center', color:'white', fontWeight:700
         }}>M</div>
-        <div>
-          <div className="title">MIERES — Propuestas</div>
-          <div style={{fontSize:12,color:'var(--gray)'}}>Julio 2025 — Any & Santi</div>
-        </div>
+        
       </div>
 
       <div style={{display:'flex', gap:12, alignItems:'center'}}>
