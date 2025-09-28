@@ -7,8 +7,12 @@ const Novedades = ({ productos }) => {
       <h2 className="text-2xl font-bold mb-6 text-gray-500 text-center">Novedades</h2>
 
       <Swiper
+
         spaceBetween={30}
         slidesPerView={2}
+        pagination={{
+          clickable: true,
+        }}
         breakpoints={{
           640: { slidesPerView: 3 },
           1024: { slidesPerView: 4 },

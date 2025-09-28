@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import styles from "./Intro.module.css";
 import ghostLogo from "../../assets/marcian.png";
 
-const Intro = ({ duration = 3600 }) => {
+const Intro = ({ duration = 3600, onComplete = () => {} }) => {
   const [isVisible, setIsVisible] = useState(true);
   const [isFading, setIsFading] = useState(false);
   const [typedTagline, setTypedTagline] = useState("");
@@ -12,13 +12,16 @@ const Intro = ({ duration = 3600 }) => {
   useEffect(() => {
     const fadeDelay = Math.max(duration - 600, 0);
     const fadeTimeout = setTimeout(() => setIsFading(true), fadeDelay);
-    const hideTimeout = setTimeout(() => setIsVisible(false), duration);
+    const hideTimeout = setTimeout(() => {
+      setIsVisible(false);
+      onComplete();
+    }, duration);
 
     return () => {
       clearTimeout(fadeTimeout);
       clearTimeout(hideTimeout);
     };
-  }, [duration]);
+  }, [duration, onComplete]);
 
   useEffect(() => {
     if (!isVisible) {
