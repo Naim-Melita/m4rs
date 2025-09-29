@@ -1,0 +1,317 @@
+.wrapper {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: black;
+  color: #f4f0ff;
+  overflow: hidden;
+  z-index: 9999;
+  isolation: isolate;
+}
+
+.fadeOut {
+  animation: fadeOut 0.7s ease forwards;
+}
+
+.noiseOverlay {
+  position: absolute;
+  inset: -15%;
+  pointer-events: none;
+  opacity: 0.13;
+}
+
+.vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+}
+
+.inner {
+  position: relative;
+  padding: clamp(3.2rem, 6vw, 4.4rem) clamp(2.8rem, 5vw, 3.6rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: clamp(1.8rem, 2.5vw, 2.4rem);
+  overflow: hidden;
+}
+
+
+
+.scanline {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  animation: scan 6s linear infinite;
+}
+
+.title {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(12rem, 28vw, 22rem);
+  filter: drop-shadow(0 0 18px rgba(160, 200, 255, 0.65))
+    drop-shadow(0 0 36px rgba(104, 130, 255, 0.5));
+}
+
+.title::before,
+.title::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  mix-blend-mode: screen;
+  opacity: 0.8;
+}
+
+.title::before {
+  background-blend-mode: screen;
+  animation: glitch1 2.8s infinite;
+}
+
+.title::after {
+  background-blend-mode: screen;
+  animation: glitch2 3s infinite;
+}
+
+.titleImage {
+  display: block;
+  width: 100%;
+  height: auto;
+  animation: shimmer 3.4s ease-in-out infinite;
+}
+
+.tagline {
+  position: relative;
+  font-size: clamp(0.88rem, 1.6vw, 1.1rem);
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: rgba(208, 222, 255, 0.85);
+  text-shadow: 0 0 12px rgba(120, 180, 255, 0.6);
+  margin: 0;
+  padding-top: 0.6rem;
+}
+
+.tagline::before,
+.tagline::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: 0.2;
+}
+
+.tagline::before {
+  color: #7ff9ff;
+  animation: taglineGlitch 1.8s infinite;
+}
+
+.tagline::after {
+  color: #ff7bd6;
+  animation: taglineGlitch jitter 1.6s infinite reverse;
+}
+
+@keyframes staticShift {
+  0% {
+    transform: translate3d(-1%, -1%, 0);
+  }
+  20% {
+    transform: translate3d(1%, -0.5%, 0);
+  }
+  40% {
+    transform: translate3d(-0.5%, 0.8%, 0);
+  }
+  60% {
+    transform: translate3d(0.3%, -0.3%, 0);
+  }
+  80% {
+    transform: translate3d(-0.7%, 0.4%, 0);
+  }
+  100% {
+    transform: translate3d(0.6%, -0.2%, 0);
+  }
+}
+
+@keyframes scan {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes glitch1 {
+  0% {
+    transform: translate(0);
+    clip-path: inset(0 0 0 0);
+  }
+  20% {
+    transform: translate(-4px, 2px);
+    clip-path: inset(0 0 45% 0);
+  }
+  40% {
+    transform: translate(3px, -2px);
+    clip-path: inset(55% 0 0 0);
+  }
+  60% {
+    transform: translate(-2px, 1px);
+    clip-path: inset(20% 0 20% 0);
+  }
+  80% {
+    transform: translate(1px, -1px);
+    clip-path: inset(65% 0 5% 0);
+  }
+  100% {
+    transform: translate(0);
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes glitch2 {
+  0%,
+  100% {
+    filter: hue-rotate(0deg);
+  }
+  33% {
+    filter: hue-rotate(120deg);
+  }
+  66% {
+    filter: hue-rotate(240deg);
+  }
+}
+
+@keyframes shimmer {
+  0%,
+  100% {
+    translate: 0 0;
+    filter: drop-shadow(0 0 18px rgba(150, 200, 255, 0.0));
+  }
+  50% {
+    translate: 0 10px;
+    filter: drop-shadow(0 0 18px rgba(150, 200, 255, .5));
+  }
+
+  50% {
+    filter: drop-shadow(0 0 18px rgba(150, 200, 255, 1));
+  }
+}
+
+@keyframes taglineGlitch {
+  0% {
+    transform: translate(0);
+  }
+  40% {
+    transform: translate(-2px, 1px);
+  }
+  60% {
+    transform: translate(2px, -1px);
+  }
+  80% {
+    transform: translate(-1px, 0);
+  }
+  100% {
+    transform: translate(0);
+  }
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+
+/* === LOGO WRAP (usa la misma medida que .title) === */
+.logoWrap{
+  position: relative;
+  width: clamp(12rem, 28vw, 22rem);
+  aspect-ratio: 1/1;              /* ajusta si tu logo no es cuadrado */
+  --intensity: 1;                  /* se sube en “bursts” */
+  filter: contrast(1.1) saturate(1.2);
+  animation: jitter 3500ms steps(200) infinite;
+  will-change: transform, filter;
+}
+
+/* Capas de imagen (RGB split) */
+.logoWrap .logo{
+  position:absolute; inset:0;
+  background-image: var(--img);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  image-rendering: pixelated;
+  filter: url(#tvNoise);
+  /* pequeño shimmer heredable */
+  animation: shimmer 3.4s ease-in-out infinite;
+}
+
+/* Base limpia */
+.logoWrap .logo.base{
+  mix-blend-mode: normal;
+  filter: url(#tvNoise) brightness(1.02);
+}
+
+/* Canales desalineados */
+/* Usamos blend screen para “sumar” color como TV vieja */
+.logoWrap .logo.r{
+  mix-blend-mode: screen;
+  filter: url(#tvNoise) drop-shadow(0 0 0 red);
+  transform: translate3d(calc(1px * var(--intensity)), 0, 0);
+  opacity:.6;
+  animation: rgbDrift 1.6s steps(10) infinite;
+}
+.logoWrap .logo.g{
+  mix-blend-mode: screen;
+  filter: url(#tvNoise) drop-shadow(0 0 0 #00ff66);
+  transform: translate3d(calc(-1px * var(--intensity)), 1px, 0);
+  opacity:.55;
+  animation: rgbDrift 1.9s steps(12) infinite reverse;
+}
+.logoWrap .logo.b{
+  mix-blend-mode: screen;
+  filter: url(#tvNoise) drop-shadow(0 0 0 #55aaff);
+  transform: translate3d(0, calc(-1px * var(--intensity)), 0);
+  opacity:.5;
+  animation: rgbDrift 1.3s steps(8) infinite;
+}
+
+/* === KEYFRAMES === */
+@keyframes jitter{
+  0%   { transform: translate3d(-0.5%, 0.3%, 0) rotate(-0.2deg) }
+  10%  { transform: translate3d(0.4%, -0.2%, 0) rotate(0.2deg) }
+  20%  { transform: translate3d(-0.6%, 0.1%, 0) rotate(-0.3deg) }
+  30%  { transform: translate3d(0.2%, 0.5%, 0) rotate(0.1deg) }
+  40%  { transform: translate3d(-0.3%, -0.4%, 0) rotate(-0.15deg) }
+  50%  { transform: translate3d(0.6%, -0.1%, 0) rotate(0.3deg) }
+  60%  { transform: translate3d(-0.2%, 0.2%, 0) rotate(-0.1deg) }
+  70%  { transform: translate3d(0.3%, -0.6%, 0) rotate(0.2deg) }
+  80%  { transform: translate3d(-0.4%, 0.4%, 0) rotate(-0.25deg) }
+  90%  { transform: translate3d(0.2%, -0.3%, 0) rotate(0.1deg) }
+  100% { transform: translate3d(0,0,0) rotate(0deg) }
+}
+
+@keyframes rgbDrift{
+  0%{ transform: translate3d(0,0,0) }
+  50%{ transform: translate3d(2px,-1px,0) }
+  100%{ transform: translate3d(0,0,0) }
+}
+
+@keyframes sliceSkew{
+  0%{ transform: translateX(0) skewX(0deg) }
+  50%{ transform: translateX(-2%) skewX(5deg) }
+  100%{ transform: translateX(0) skewX(0deg) }
+}
+
+/* Ya tenés scan, shimmer, etc. Reutilizás los tuyos */

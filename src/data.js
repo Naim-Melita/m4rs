@@ -19,4 +19,20 @@ export const productos = [
     precio: "HK$3,499.00",
     imagen: "/modelo2.png",
   },
+
+  {
+    nombre: "Camo Jacket",
+    precio: "HK$3,499.00",
+    imagen: "/modelo2.png",
+  },
+  {
+    nombre: "Camo Jacket",
+    precio: "HK$3,499.00",
+    imagen: "/modelo2.png",
+  },
+  {
+    nombre: "Camo Jacket",
+    precio: "HK$3,499.00",
+    imagen: "/modelo2.png",
+  },
 ];
