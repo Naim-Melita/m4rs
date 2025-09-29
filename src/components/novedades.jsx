@@ -4,7 +4,7 @@ import "swiper/css";
 const Novedades = ({ productos }) => {
   return (
     <section className="max-w-7xl mx-auto px-4 py-10">
-      <h2 className="text-2xl font-bold mb-6 text-gray-500 text-center">Novedades</h2>
+      <h2 className="text-2xl font-bold mb-6 text-black text-center">Novedades</h2>
 
       <Swiper
 
@@ -38,15 +38,16 @@ const Novedades = ({ productos }) => {
               </div>
 
               {/* Texto */}
-              <h3 className="mt-3 text-sm font-normal tracking-wide text-center">
+              <h3 className="mt-3 text-black text-sm font-normal tracking-wide text-center">
                 {item.nombre}
               </h3>
-              <p className="text-gray-500 text-sm text-center">{item.precio}</p>
+              <p className="text-black text-sm text-center">{item.precio}</p>
             </div>
           </SwiperSlide>
         ))}
       </Swiper>
     </section>
+    
   );
 };
 

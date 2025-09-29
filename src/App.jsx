@@ -11,6 +11,8 @@ const introComponents = {
   grid: GridIntro,
   glitch: GlitchIntro,
 };
+import PromoSection from "./components/galery";
+
 
 export default function App() {
   const [scrolled, setScrolled] = useState(false);
@@ -76,11 +78,14 @@ export default function App() {
 
       {/* Contenido principal */}
       <main>
-        <div style={{ height: "100vh", padding: "2rem" }}>
-          <h2>Contenido de prueba</h2>
-          <p>Scroll para ver novedades...</p>
+        <div style={{ background: "#f2f2f2", padding: "2rem" }}>
           <Novedades productos={productos} />
+            
         </div>
+        <div>
+          <PromoSection />
+        </div>
+            
 
         {/* Footer */}
         <Footer />

@@ -53,6 +53,7 @@ body {
 .header-right .icon {
   font-size: 1.3rem;
   cursor: pointer;
+  color: black;
 }
 
 /* === HERO === */
