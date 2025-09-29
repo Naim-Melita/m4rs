@@ -2,10 +2,10 @@ import React from "react";
 
 const PromoSection = () => {
   return (
-    <section className="w-full bg-white py-12">
+    <section className="w-full bg-white py-12 ">
       {/* Título principal */}
-      <h2 className="text-3xl text-black font-bold text-center mb-10 tracking-wide uppercase">
-        Galería de imágenes
+         <h2 className="text-3xl font-bold mb-6 uppercase text-black text-center">
+          Colección de imágenes
       </h2>
 
       {/* Contenedor de las dos imágenes */}
@@ -14,7 +14,7 @@ const PromoSection = () => {
         {/* Imagen 1 */}
         <div className="relative group">
           <img
-            src="/src/images/Bape_Fall25_Ad_Banner_AUG_Bape_tmall_750x750_0ea5af47-d862-49b1-a83e-9bf4101534dd (1).webp"
+            src="/src/assets/galery1.jpg"
             alt="Wild Leopard"
             className="w-full h-[1000px] object-cover"
           />
@@ -29,7 +29,7 @@ const PromoSection = () => {
         {/* Imagen 2 */}
         <div className="relative group">
           <img
-            src="/src/images/BAPE_x_88rising_BANNER_Bape_tmall_1200x1200_4499c2eb-56e8-4a0a-86ff-1178135ce17d (1).webp"
+                 src="/src/assets/galery2.jpg"
             alt="88Rising Collab"
             className="w-full h-[1000px] object-cover"
           />

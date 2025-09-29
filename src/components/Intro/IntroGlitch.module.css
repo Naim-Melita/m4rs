@@ -36,7 +36,6 @@
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  gap: clamp(1.8rem, 2.5vw, 2.4rem);
   overflow: hidden;
 }
 
@@ -99,6 +98,7 @@
   text-shadow: 0 0 12px rgba(120, 180, 255, 0.6);
   margin: 0;
   padding-top: 0.6rem;
+  text-align: center;
 }
 
 .tagline::before,
