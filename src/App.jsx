@@ -5,14 +5,13 @@ import "./index.css";
 import Novedades from "./components/novedades";
 import Footer from "./components/footer";
 import { productos } from "./data";
-
+import logo from "../src/assets/logo2.png";
+import PromoSection from "./components/galery";
 const INTRO_VARIANT = "glitch";
 const introComponents = {
   grid: GridIntro,
   glitch: GlitchIntro,
 };
-import PromoSection from "./components/galery";
-
 
 export default function App() {
   const [scrolled, setScrolled] = useState(false);
@@ -45,12 +44,17 @@ export default function App() {
 
   const headerActive = scrolled || introFinished;
 
+  {
+    console.log(introFinished);
+  }
   return (
     <>
       <ActiveIntro onComplete={handleIntroComplete} />
 
       <header className={`header ${headerActive ? "show" : ""}`}>
-        <div className={`logo ${introFinished ? "logo-animated" : ""}`}>M4RS</div>
+        <div className={`logo ${introFinished ? "logo-animated" : ""}`}>
+          M4RS
+        </div>
         <div className="header-right">
           <span className="icon">?</span>
           <span className="icon">?</span>
@@ -61,15 +65,17 @@ export default function App() {
       <section className="hero">
         <div className="overlay"></div>
         <div
-          className={`hero-logo ${scrolled ? "to-header" : ""} ${introFinished ? "hero-logo-animated" : ""}`}
+          className={`hero-logo ${scrolled ? "to-header" : ""} ${
+            introFinished ? "hero-logo-animated" : ""
+          }`}
           data-text="M4RS"
         >
-          M4RS
+          {introFinished && <img src={logo} alt="logo" data-aos="flip-up" />}
         </div>
         <div
-          className={`hero-subtitle ${introVisible ? "visible" : ""} ${scrolled ? "fade-out" : ""} ${
-            introFinished ? "hero-subtitle-animated" : ""
-          }`}
+          className={`hero-subtitle ${introVisible ? "visible" : ""} ${
+            scrolled ? "fade-out" : ""
+          } ${introFinished ? "hero-subtitle-animated" : ""}`}
           data-text="LO RARO SE VOLVIO ESTILO"
         >
           LO RARO SE VOLVIO ESTILO
@@ -78,14 +84,13 @@ export default function App() {
 
       {/* Contenido principal */}
       <main>
-        <div style={{ background: "#f2f2f2", padding: "2rem" }}>
+        <div style={{ height: "100vh", padding: "2rem" }}>
+          <h2>Contenido de prueba</h2>
+          <p>Scroll para ver novedades...</p>
           <Novedades productos={productos} />
-            
         </div>
-        <div>
-          <PromoSection />
-        </div>
-            
+
+        <PromoSection />
 
         {/* Footer */}
         <Footer />
