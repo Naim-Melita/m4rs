@@ -7,6 +7,7 @@ import Footer from "./components/footer";
 import { productos } from "./data";
 import logo from "../src/assets/logo2.png";
 import PromoSection from "./components/galery";
+
 const INTRO_VARIANT = "glitch";
 const introComponents = {
   grid: GridIntro,
@@ -21,9 +22,14 @@ export default function App() {
 
   const handleIntroComplete = useCallback(() => {
     setIntroFinished(true);
+    // habilitar scroll cuando termina la intro
+    document.body.style.overflow = "auto";
   }, []);
 
   useEffect(() => {
+    // bloquear scroll al inicio
+    document.body.style.overflow = "hidden";
+
     const showTimer = setTimeout(() => setIntroVisible(true), 100);
     const handleScroll = () => {
       if (window.scrollY > window.innerHeight - 80) {
@@ -39,12 +45,13 @@ export default function App() {
     return () => {
       clearTimeout(showTimer);
       window.removeEventListener("scroll", handleScroll);
+      // restaurar scroll por si se desmonta
+      document.body.style.overflow = "auto";
     };
   }, []);
 
-  const headerActive = scrolled || introFinished;
+  const headerActive = scrolled;
 
-  
   return (
     <>
       <ActiveIntro onComplete={handleIntroComplete} />
@@ -68,12 +75,21 @@ export default function App() {
           }`}
           data-text="M4RS"
         >
-          {introFinished && <img className="w-1/2 mx-auto md:w-full" src={logo} alt="logo" data-aos="flip-up" />}
+          {introFinished && (
+            <img
+              className="w-1/2 mx-auto md:w-full"
+              src={logo}
+              alt="logo"
+              data-aos="flip-up"
+            />
+          )}
         </div>
         <div
-          className={`hero-subtitle mt-2 text-center text-sm ${introVisible ? "visible" : ""} ${
-            scrolled ? "fade-out" : ""
-          } ${introFinished ? "hero-subtitle-animated" : ""}`}
+          className={`hero-subtitle mt-2 text-center text-sm ${
+            introVisible ? "visible" : ""
+          } ${scrolled ? "fade-out" : ""} ${
+            introFinished ? "hero-subtitle-animated" : ""
+          }`}
           data-text="LO RARO SE VOLVIO ESTILO"
           data-aos="flip-down"
         >

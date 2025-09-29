@@ -25,15 +25,18 @@ body {
   background: white;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
   z-index: 1000;
-  transform: translateY(-100%);
-  transition: transform 0.5s ease;
+
+  /* oculto por defecto */
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
   padding: 0 20px;
 }
 
 .header.show {
-  transform: translateY(0);
+  opacity: 1;              /* aparece al hacer scroll */
+  pointer-events: auto;
 }
-
 .logo {
   position: absolute;
   left: 50%;
