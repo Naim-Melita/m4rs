@@ -44,9 +44,7 @@ export default function App() {
 
   const headerActive = scrolled || introFinished;
 
-  {
-    console.log(introFinished);
-  }
+  
   return (
     <>
       <ActiveIntro onComplete={handleIntroComplete} />
@@ -65,18 +63,19 @@ export default function App() {
       <section className="hero">
         <div className="overlay"></div>
         <div
-          className={`hero-logo ${scrolled ? "to-header" : ""} ${
+          className={`hero-logo  ${scrolled ? "to-header" : ""} ${
             introFinished ? "hero-logo-animated" : ""
           }`}
           data-text="M4RS"
         >
-          {introFinished && <img src={logo} alt="logo" data-aos="flip-up" />}
+          {introFinished && <img className="w-1/2 mx-auto md:w-full" src={logo} alt="logo" data-aos="flip-up" />}
         </div>
         <div
-          className={`hero-subtitle ${introVisible ? "visible" : ""} ${
+          className={`hero-subtitle mt-2 text-center text-sm ${introVisible ? "visible" : ""} ${
             scrolled ? "fade-out" : ""
           } ${introFinished ? "hero-subtitle-animated" : ""}`}
           data-text="LO RARO SE VOLVIO ESTILO"
+          data-aos="flip-down"
         >
           LO RARO SE VOLVIO ESTILO
         </div>
@@ -84,14 +83,10 @@ export default function App() {
 
       {/* Contenido principal */}
       <main>
-        <div style={{ height: "100vh", padding: "2rem" }}>
-          <h2>Contenido de prueba</h2>
-          <p>Scroll para ver novedades...</p>
+        <div>
           <Novedades productos={productos} />
         </div>
-
         <PromoSection />
-
         {/* Footer */}
         <Footer />
       </main>
