@@ -10,13 +10,13 @@ const Novedades = ({ productos }) => {
 
       <div className="flex justify-center">
         <div className="grid container grid-cols-1 md:grid-cols-4 justify-center place-items-center">
-          {productos.map((item, i) => (
-            <div c>
+          {productos.map((item) => (
+            <div key={item.nombre}>
               <div className="group cursor-pointer ">
                 {/* Imagen */}
                 <div className="relative w-full  overflow-hidden bg-[#f5f5f5] rounded-md mx-auto">
                   <img
-                    src={"./src/assets/" + item.imagen}
+                    src={item.imagen}
                     alt={item.nombre}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                   />
