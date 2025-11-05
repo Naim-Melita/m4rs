@@ -7,6 +7,7 @@ import Footer from "./components/footer";
 import { productos } from "./data";
 import logo from "../src/assets/logo2.png";
 import PromoSection from "./components/galery";
+import Header from "./components/Header"; // 👈 Importamos el header
 
 const INTRO_VARIANT = "glitch";
 const introComponents = {
@@ -50,23 +51,15 @@ export default function App() {
     };
   }, []);
 
-  const headerActive = scrolled;
-
   return (
     <>
+      {/* Intro animada */}
       <ActiveIntro onComplete={handleIntroComplete} />
 
-      <header className={`header ${headerActive ? "show" : ""}`}>
-        <div className={`logo ${introFinished ? "logo-animated" : ""}`}>
-          M4RS
-        </div>
-        <div className="header-right">
-          <span className="icon">?</span>
-          <span className="icon">?</span>
-          <span className="icon">?</span>
-        </div>
-      </header>
+      {/* Header reutilizado */}
+      <Header />
 
+      {/* Hero */}
       <section className="hero">
         <div className="overlay"></div>
         <div
@@ -103,7 +96,6 @@ export default function App() {
           <Novedades productos={productos} />
         </div>
         <PromoSection />
-        {/* Footer */}
         <Footer />
       </main>
     </>
