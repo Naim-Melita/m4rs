@@ -1,21 +1,15 @@
 import React, { useState, useEffect } from "react";
-import {
-  MagnifyingGlassIcon,
-  UserIcon,
-  ShoppingBagIcon,
-  ChevronDownIcon,
-} from "@heroicons/react/24/outline";
+import { MagnifyingGlassIcon, UserIcon } from "@heroicons/react/24/outline";
+import CartButton from "./cart/CartButton";
+import CartDropdown from "./cart/CartDropdown";
 
 export default function Header() {
-  const [showHeader, setShowHeader] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [cartOpen, setCartOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > window.innerHeight - 80) {
-        setShowHeader(true);
-      } else {
-        setShowHeader(false);
-      }
+      setIsScrolled(window.scrollY > window.innerHeight * 0.2);
     };
 
     window.addEventListener("scroll", handleScroll);
@@ -24,42 +18,57 @@ export default function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const iconClasses = isScrolled
+    ? "text-gray-700 hover:text-black"
+    : "text-white hover:text-white/80";
+
   return (
     <header
-      className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 
-      ${showHeader ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-full"}`}
+      className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${
+        isScrolled
+          ? "bg-white/95 shadow-md backdrop-blur-sm"
+          : "bg-transparent "
+      }`}
     >
-      <div className="flex items-center justify-center h-16 px-6 bg-white shadow-md">
+      <div
+        className={`flex items-center justify-center h-16 px-6 transition-all duration-500 ${
+          isScrolled ? "text-gray-700" : "text-white"
+        }`}
+      >
         {/* Logo centrado */}
-        <div className="absolute left-1/2 transform text-black -translate-x-1/2 text-2xl font-bold tracking-widest">
+        <div
+          className={`absolute left-1/2 transform -translate-x-1/2 text-2xl font-bold tracking-widest transition-colors ${
+            isScrolled ? "text-black" : "text-white hidden"
+          }`}
+        >
           M4RS
         </div>
 
         {/* Íconos alineados a la derecha */}
-        <div className="ml-auto flex items-center gap-5 text-gray-700">
+        <div
+          className={`ml-auto flex items-center gap-5 ${
+            isScrolled ? "text-gray-700" : "text-white"
+          }`}
+        >
           {/* Lupa */}
-          <MagnifyingGlassIcon className="w-5 h-5 cursor-pointer hover:text-black transition" />
+          <MagnifyingGlassIcon
+            className={`w-5 h-5 cursor-pointer transition ${iconClasses}`}
+          />
 
           {/* Usuario */}
-          <UserIcon className="w-5 h-5 cursor-pointer hover:text-black transition" />
-
-          {/* Idioma
-          <div className="flex items-center gap-1 cursor-pointer hover:text-black transition">
-            <span className="text-sm">ES</span>
-            <ChevronDownIcon className="w-4 h-4" />
-          </div> */}
-
-          {/* Moneda */}
-          {/* <div className="flex items-center gap-1 cursor-pointer hover:text-black transition">
-            <span role="img" aria-label="Argentina">
-              🇦🇷
-            </span>
-            <span className="text-sm">USD$</span>
-            <ChevronDownIcon className="w-4 h-4" />
-          </div> */}
+          <UserIcon
+            className={`w-5 h-5 cursor-pointer transition ${iconClasses}`}
+          />
 
           {/* Carrito / Bolsa */}
-          <ShoppingBagIcon className="w-5 h-5 cursor-pointer hover:text-black transition" />
+          <div className="relative mt-2 md:mt-1">
+            <CartButton
+              onClick={() => setCartOpen(true)}
+              className="size-5 md:size-7 pb-1"
+              iconClassName={iconClasses}
+            />
+            <CartDropdown open={cartOpen} onClose={() => setCartOpen(false)} />
+          </div>
         </div>
       </div>
     </header>

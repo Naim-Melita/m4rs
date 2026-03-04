@@ -7,11 +7,6 @@ export interface Product {
   description?: string;
   materials: string[];
   styleTags: string[];
-  roomTags: string[];
-  widthCm?: number;
-  depthCm?: number;
-  heightCm?: number;
-  weightKg?: number;
   status: "DRAFT" | "PUBLISHED" | "ARCHIVED";
   featured: boolean;
   publishedAt?: string;

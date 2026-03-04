@@ -1,35 +1,24 @@
 "use client";
 
-import Link from "next/link";
 import { X, Plus, Minus, Trash2 } from "lucide-react";
 import { useEffect, useRef } from "react";
-import useCartStore from "@/hooks/useCarritoStore"; // o "@/stores/useCartStore"
-import { Product } from "@/models/Product";
-import { getDiscount } from "@/utils/getDiscount";
+import useCartStore from "../../hooks/useCarritoStore"; // o "@/stores/useCartStore"
+import { getDiscount } from "../../utils/getDiscount";
 
-function formatCurrency(n: number) {
+function formatCurrency(n) {
   return new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 }).format(n);
 }
 
-
-type ProductWithQuantity = Product & { quantity: number };
-
-type Props = {
-  open: boolean;
-  onClose: () => void;
-  anchorRight?: boolean; // para alinear a derecha (default)
-};
-
-export default function CartDropdown({ open, onClose, anchorRight = true }: Props) {
-  const ref = useRef<HTMLDivElement | null>(null);
+export default function CartDropdown({ open, onClose, anchorRight = true }) {
+  const ref = useRef(null);
 
   const items = useCartStore((s) => s.items ?? []);
-  const addItem = useCartStore((s) => s.addItem ?? ((p: any) => {}));
-  const removeOne = useCartStore((s) => s.removeOne ?? ((id: number) => {}));
-  const removeItem = useCartStore((s) => s.removeItem ?? ((id: number) => {}));
+  const addItem = useCartStore((s) => s.addItem ?? ((p) => {}));
+  const removeOne = useCartStore((s) => s.removeOne ?? ((id) => {}));
+  const removeItem = useCartStore((s) => s.removeItem ?? ((id) => {}));
   const clearCart = useCartStore((s) => s.clearCart ?? (() => {}));
 
-  const total = items.reduce((sum: number, it: any) => {
+  const total = items.reduce((sum, it) => {
     const discount = Number(it.discountPercentage ?? 0);
     const unitPrice = getDiscount(it.price ?? 0, discount);
     return sum + unitPrice * (it.quantity ?? 1);
@@ -37,10 +26,10 @@ export default function CartDropdown({ open, onClose, anchorRight = true }: Prop
 
   // cerrar al click afuera / ESC
   useEffect(() => {
-    function handleClick(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) onClose();
+    function handleClick(e) {
+      if (ref.current && !ref.current.contains(e.target)) onClose();
     }
-    function handleEsc(e: KeyboardEvent) {
+    function handleEsc(e) {
       if (e.key === "Escape") onClose();
     }
     if (open) {
@@ -58,7 +47,7 @@ export default function CartDropdown({ open, onClose, anchorRight = true }: Prop
   return (
     <div
       ref={ref}
-      className={`absolute top-full mt-2 w-[360px] max-h-[70vh] overflow-auto rounded-2xl bg-white text-neutral-900 shadow-lg ring-1 ring-neutral-200/60 z-50 ${
+      className={`absolute top-full mt-2 w-[360px] max-h-[70vh] overflow-auto  bg-white text-neutral-900 shadow-lg ring-1 ring-neutral-200/60 z-50 ${
         anchorRight ? "right-0" : "left-0"
       }`}
     >
@@ -74,7 +63,7 @@ export default function CartDropdown({ open, onClose, anchorRight = true }: Prop
         {items.length === 0 ? (
           <li className="px-4 py-6 text-sm text-neutral-500">El carrito está vacío</li>
         ) : (
-          items.map((it: ProductWithQuantity) => {
+          items.map((it) => {
             const discount = Number(it.discountPercentage ?? 0);
             const quantity = it.quantity ?? 1;
             const hasDiscount = discount > 0;
@@ -84,7 +73,7 @@ export default function CartDropdown({ open, onClose, anchorRight = true }: Prop
             return (
               <li key={it.id} className="px-4 py-3 flex items-center gap-3">
                 <img
-                  src={it.images?.[0] ?? "/images/placeholder.jpg"}
+                  src={it.image ?? "/images/placeholder.jpg"}
                   alt={it.title}
                   className="w-14 h-14 rounded-lg object-cover bg-neutral-100 ring-1 ring-neutral-200/60"
                 />
@@ -155,20 +144,20 @@ export default function CartDropdown({ open, onClose, anchorRight = true }: Prop
           <span className="font-semibold">{formatCurrency(total)}</span>
         </div>
         <div className="mt-3 flex gap-2">
-          <Link
+          <p
             href="/carrito"
-            className="flex-1 h-10 inline-flex items-center justify-center rounded-xl bg-neutral-100 text-neutral-800 ring-1 ring-neutral-300 hover:bg-white"
+            className="flex-1 h-10 inline-flex items-center justify-center bg-neutral-100 text-neutral-800 cursor-pointer ring-1 ring-neutral-300 hover:bg-white"
             onClick={onClose}
           >
             Ver carrito
-          </Link>
-          <Link
+          </p>
+          <p
             href="/checkout"
-            className="flex-1 h-10 inline-flex items-center justify-center rounded-xl bg-[#840c4a] text-white hover:opacity-90"
+            className="flex-1 h-10 inline-flex items-center justify-center  bg-black cursor-pointer text-white hover:opacity-90"
             onClick={onClose}
           >
             Comprar
-          </Link>
+          </p>
         </div>
         <button
           onClick={() => {

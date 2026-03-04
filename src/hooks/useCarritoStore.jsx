@@ -1,26 +1,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import { Product } from "@/models/Product";
 
-export type CartItem = Product & { quantity: number };
-
-type CartState = {
-  items: CartItem[];
-
-  // actions
-  addItem: (product: Product, qty?: number) => void;
-  removeOne: (id: string) => void;        // decrease quantity by 1
-  removeItem: (id: string) => void;       // remove the whole item
-  setItemQuantity: (id: string, qty: number) => void;
-  clearCart: () => void;
-
-  // selectors (handy for UI)
-  getItemQuantity: (id: string) => number;
-  getTotalItems: () => number;            // total units, e.g., 7
-  getUniqueItems: () => number;           // total unique products, e.g., 3
-};
-
-const useCartStore = create<CartState>()(
+const useCartStore = create()(
   persist(
     (set, get) => ({
       items: [],
@@ -39,7 +20,7 @@ const useCartStore = create<CartState>()(
           return { items: [...state.items, { ...product, quantity: qty }] };
         }),
 
-      removeOne: (id:string) =>
+      removeOne: (id) =>
         set((state) => {
           const item = state.items.find((it) => it.id === id);
           if (!item) return { items: state.items };

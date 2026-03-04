@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import styles from "./IntroGlitch.module.css";
 import logo2 from "../../assets/logo2.png";
 
-const IntroGlitch = ({ duration = 3600, onComplete = () => {} }) => {
+const IntroGlitch = ({ duration = 5600, onComplete = () => {} }) => {
   const [isVisible, setIsVisible] = useState(true);
   const [isFading, setIsFading] = useState(false);
   const [glitchCycle, setGlitchCycle] = useState(false);
