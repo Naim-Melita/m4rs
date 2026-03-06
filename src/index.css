@@ -22,15 +22,6 @@ a {
   font-weight: 500;
 }
 
-button {
-  appearance: none;
-  -webkit-appearance: none;
-  border: 0;
-  background: transparent;
-  color: inherit;
-  font: inherit;
-}
-
 body {
   margin: 0;
   background-color: #ffffff;
