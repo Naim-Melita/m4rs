@@ -55,7 +55,7 @@ const Footer = () => {
       <div className="max-w-7xl mx-auto px-6 py-6 flex flex-col sm:flex-row justify-between items-center border-t border-gray-800">
         <div className="flex gap-6 text-gray-400 text-xs uppercase">
           <button className="hover:text-white">Español</button>
-          <button className="hover:text-white">USD $</button>
+          <button className="hover:text-white">ARS$</button>
         </div>
         <div className="flex gap-4 mt-4 sm:mt-0 text-gray-400">
           <a href="#" className="hover:text-white no-underline">Instagram</a>

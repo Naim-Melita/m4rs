@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { MagnifyingGlassIcon, UserIcon } from "@heroicons/react/24/outline";
+import { Link } from "react-router-dom";
 import CartButton from "./cart/CartButton";
 import CartDropdown from "./cart/CartDropdown";
 
-export default function Header() {
+export default function Header({ darkOnTop = false }) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
 
@@ -18,9 +19,17 @@ export default function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const iconClasses = isScrolled
+  const topIconClasses = darkOnTop
     ? "text-gray-700 hover:text-black"
     : "text-white hover:text-white/80";
+  const iconClasses = isScrolled
+    ? "text-gray-700 hover:text-black"
+    : topIconClasses;
+  const logoClasses = isScrolled
+    ? "text-black"
+    : darkOnTop
+      ? "text-black"
+      : "hidden text-white";
 
   return (
     <header
@@ -36,18 +45,21 @@ export default function Header() {
         }`}
       >
         {/* Logo centrado */}
-        <div
-          className={`absolute left-1/2 transform -translate-x-1/2 text-2xl font-bold tracking-widest transition-colors ${
-            isScrolled ? "text-black" : "text-white hidden"
-          }`}
+        <Link
+          to="/"
+          className={`absolute left-1/2 -translate-x-1/2 text-2xl font-bold tracking-widest no-underline transition-colors ${logoClasses}`}
         >
           M4RS
-        </div>
+        </Link>
 
         {/* Íconos alineados a la derecha */}
         <div
           className={`ml-auto flex items-center gap-5 ${
-            isScrolled ? "text-gray-700" : "text-white"
+            isScrolled
+              ? "text-gray-700"
+              : darkOnTop
+                ? "text-gray-700"
+                : "text-white"
           }`}
         >
           {/* Lupa */}

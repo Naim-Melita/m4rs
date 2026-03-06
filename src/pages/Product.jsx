@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
+import { Link, useParams } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/footer";
 import useCartStore from "../hooks/useCarritoStore";
-import { productoDestacado } from "../data";
+import { getProductById } from "../data";
 import { getDiscount } from "../utils/getDiscount";
 import {
   Truck,
@@ -20,29 +21,41 @@ const formatCurrency = (value) =>
   }).format(value);
 
 export default function ProductPage() {
-  const product = productoDestacado;
-  const [activeImage, setActiveImage] = useState(product.images[0]);
-  const [selectedSize, setSelectedSize] = useState(product.sizes?.[0] ?? "");
+  const { id } = useParams();
+  const product = getProductById(id);
+  const hasSizes = Boolean(product?.sizes?.length);
+  const [activeImage, setActiveImage] = useState(product?.images?.[0] ?? "");
+  const [selectedSize, setSelectedSize] = useState(product?.sizes?.[0] ?? "");
   const [quantity, setQuantity] = useState(1);
   const [feedback, setFeedback] = useState(false);
 
   const addItem = useCartStore((state) => state.addItem);
 
+  useEffect(() => {
+    if (!product) return;
+    setActiveImage(product.images?.[0] ?? "");
+    setSelectedSize(product.sizes?.[0] ?? "");
+    setQuantity(1);
+    setFeedback(false);
+  }, [product]);
+
   const computedPrice = useMemo(() => {
+    if (!product) return 0;
     if (product.price) return product.price;
     return getDiscount(
       product.compareAtPrice ?? 0,
       product.discountPercentage ?? 0
     );
-  }, [product.compareAtPrice, product.discountPercentage, product.price]);
+  }, [product?.compareAtPrice, product?.discountPercentage, product?.price]);
 
   const compareAtPrice = useMemo(() => {
+    if (!product) return 0;
     if (product.compareAtPrice) return product.compareAtPrice;
     const discount = Number(product.discountPercentage ?? 0);
     if (discount <= 0) return computedPrice;
     const gross = computedPrice / (1 - discount / 100);
     return Math.round(gross);
-  }, [computedPrice, product.compareAtPrice, product.discountPercentage]);
+  }, [computedPrice, product?.compareAtPrice, product?.discountPercentage]);
 
   useEffect(() => {
     if (!feedback) return;
@@ -58,14 +71,14 @@ export default function ProductPage() {
   };
 
   const handleAddToCart = () => {
-    const basePrice = compareAtPrice ?? computedPrice;
+    if (!product) return;
     addItem(
       {
-        id: `${product.id}-${selectedSize || "unico"}`,
-        title: `${product.name}${
-          selectedSize ? ` · Talle ${selectedSize}` : ""
-        }`,
-        price: basePrice,
+        id: hasSizes ? `${product.id}-${selectedSize || "unico"}` : product.id,
+        title: hasSizes
+          ? `${product.name}${selectedSize ? ` · Talle ${selectedSize}` : ""}`
+          : product.name,
+        price: computedPrice,
         discountPercentage: product.discountPercentage ?? 0,
         image: activeImage,
         categories: product.categories,
@@ -75,7 +88,34 @@ export default function ProductPage() {
     setFeedback(true);
   };
 
-  const miniCards = [
+  if (!product) {
+    return (
+      <div className="min-h-screen bg-white text-neutral-900">
+        <Header darkOnTop />
+        <main className="container mx-auto px-4 pb-16 pt-28 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-xl rounded-3xl border border-neutral-200 bg-neutral-50 p-8 text-center">
+            <p className="text-sm uppercase tracking-[0.3em] text-neutral-400">
+              M4RS
+            </p>
+            <h1 className="mt-3 text-3xl font-semibold">Producto no encontrado</h1>
+            <p className="mt-3 text-sm text-neutral-600">
+              La ruta no coincide con ningun producto cargado en `data.js`.
+            </p>
+            <Link
+              to="/"
+              className="mt-6 inline-flex rounded-full bg-black px-6 py-3 text-sm font-semibold uppercase tracking-wide text-white no-underline"
+            >
+              Volver al inicio
+            </Link>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  const miniCards = product
+    ? [
     {
       icon: <Truck className="size-5" />,
       title: "Envío express",
@@ -94,16 +134,17 @@ export default function ProductPage() {
         product.installmentInfo ??
         "Cuotas fijas con las principales tarjetas y billeteras virtuales.",
     },
-  ];
+  ]
+    : [];
 
   return (
     <div className="bg-white min-h-screen text-neutral-900">
-      <Header />
+      <Header darkOnTop />
       <main className="pt-24 pb-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <section className="grid gap-12 lg:grid-cols-[1.35fr,1fr]">
+          <section className="grid gap-10 lg:grid-cols-[minmax(0,620px)_minmax(340px,1fr)] lg:items-start">
             {/* Galería */}
-            <div className="grid items-start gap-6 lg:grid-cols-[96px,minmax(0,1fr)]">
+            <div className="grid items-start gap-5 lg:grid-cols-[84px_minmax(0,1fr)]">
               <div className="order-2 flex gap-3 overflow-x-auto pb-2 lg:order-1 lg:flex-col lg:overflow-visible">
                 {product.images.map((img) => {
                   const isActive = img === activeImage;
@@ -112,7 +153,7 @@ export default function ProductPage() {
                       key={img}
                       type="button"
                       onClick={() => setActiveImage(img)}
-                      className={`h-20 w-20 flex-shrink-0 rounded-lg border transition lg:h-24 lg:w-24 ${
+                      className={`h-16 w-16 flex-shrink-0 rounded-lg border transition lg:h-20 lg:w-20 ${
                         isActive
                           ? "border-black ring-2 ring-neutral-900"
                           : "border-neutral-200 hover:border-neutral-500"
@@ -127,7 +168,7 @@ export default function ProductPage() {
                   );
                 })}
               </div>
-              <div className="order-1 aspect-[3/4] w-full overflow-hidden rounded-2xl bg-neutral-50 ring-1 ring-neutral-200/70 lg:order-2">
+              <div className="order-1 mx-auto aspect-[4/5] w-full max-w-[560px] overflow-hidden rounded-2xl bg-neutral-50 ring-1 ring-neutral-200/70 lg:order-2">
                 <img
                   src={activeImage}
                   alt={product.name}
@@ -138,7 +179,7 @@ export default function ProductPage() {
             </div>
 
             {/* Información */}
-            <div className="space-y-7">
+            <div className="space-y-7 lg:sticky lg:top-28">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.4em] text-neutral-400">
@@ -176,46 +217,48 @@ export default function ProductPage() {
                 ) : null}
               </div>
 
-              <div className="rounded-2xl border border-neutral-200 bg-white/80 p-5 shadow-sm shadow-neutral-100/30">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-semibold text-neutral-800">
-                    Seleccioná tu talle
-                  </span>
-                  <button
-                    type="button"
-                    className="text-xs font-semibold uppercase tracking-wide text-neutral-500 hover:text-neutral-900"
-                  >
-                    Guía de talles
-                  </button>
+              {hasSizes ? (
+                <div className="rounded-2xl border border-neutral-200 bg-white/80 p-5 shadow-sm shadow-neutral-100/30">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-semibold text-neutral-800">
+                      Seleccioná tu talle
+                    </span>
+                    <button
+                      type="button"
+                      className="text-xs font-semibold uppercase tracking-wide text-neutral-500 hover:text-neutral-900"
+                    >
+                      Guía de talles
+                    </button>
+                  </div>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {product.sizes.map((size) => {
+                      const isSelected = size === selectedSize;
+                      return (
+                        <button
+                          key={size}
+                          type="button"
+                          onClick={() => setSelectedSize(size)}
+                          className={`min-w-[64px] rounded-full border px-5 py-2 text-sm font-medium transition ${
+                            isSelected
+                              ? "border-black bg-black text-white shadow-sm"
+                              : "border-neutral-300 text-neutral-700 hover:border-neutral-600"
+                          }`}
+                        >
+                          {size}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {product.fitGuide ? (
+                    <p className="mt-3 text-xs text-neutral-500">
+                      {product.fitGuide}
+                    </p>
+                  ) : null}
                 </div>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {product.sizes.map((size) => {
-                    const isSelected = size === selectedSize;
-                    return (
-                      <button
-                        key={size}
-                        type="button"
-                        onClick={() => setSelectedSize(size)}
-                        className={`min-w-[64px] rounded-full border px-5 py-2 text-sm font-medium transition ${
-                          isSelected
-                            ? "border-black bg-black text-white shadow-sm"
-                            : "border-neutral-300 text-neutral-700 hover:border-neutral-600"
-                        }`}
-                      >
-                        {size}
-                      </button>
-                    );
-                  })}
-                </div>
-                {product.fitGuide ? (
-                  <p className="mt-3 text-xs text-neutral-500">
-                    {product.fitGuide}
-                  </p>
-                ) : null}
-              </div>
+              ) : null}
 
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                <div className="inline-flex items-center rounded-full border border-neutral-300">
+                <div className="inline-flex items-center justify-center rounded-full border border-neutral-300">
                   <button
                     type="button"
                     onClick={() => handleQuantityChange(-1)}
@@ -255,7 +298,7 @@ export default function ProductPage() {
                 {product.description}
               </p>
 
-              <div className="grid gap-4 sm:grid-cols-3">
+              {/* <div className="grid gap-4 sm:grid-cols-3">
                 {miniCards.map((item) => (
                   <div
                     key={item.title}
@@ -272,7 +315,7 @@ export default function ProductPage() {
                     </p>
                   </div>
                 ))}
-              </div>
+              </div> */}
             </div>
           </section>
 

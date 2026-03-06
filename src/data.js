@@ -4,81 +4,115 @@ import image3 from "./assets/image3.jpg";
 import image4 from "./assets/image4.jpg";
 import galery1 from "./assets/galery1.jpg";
 import galery2 from "./assets/galery2.jpg";
+import fragmento01Front from "./assets/products/fragmento01/fragmento01.jpeg";
+import fragmento01Detail from "./assets/products/fragmento01/fragmento01-detalle.jpeg";
+import fragmento01Back from "./assets/products/fragmento01/fragmento02-trasero.jpeg";
+import patchFront from "./assets/products/patch/patch1.jpg";
+import patchDetail from "./assets/products/patch/patch2.jpg";
+import patchSide from "./assets/products/patch/patch3.jpg";
 
 export const productos = [
   {
-    id: "producto-1",
-    name: "Crystal Stone Tee",
-    price: 2799.00,
-    image: image1,
+    id: "fragmento-01",
+    sku: "M4-FRAG-01",
+    name: "Fragmento 01",
+    slug: "fragmento-01",
+    price: 48000,
+    compareAtPrice: null,
+    discountPercentage: 0,
+    installmentInfo: "3 cuotas sin interés de $16.000 con tarjetas seleccionadas.",
+    description:
+      "FRAGMENTO 01 nace del concepto de ruptura dentro del sistema. Una base negra limpia intervenida por fragmentos azules que irrumpen como código alterado. No siguen reglas. No buscan simetría. No piden permiso. Diseñada para quienes entienden que lo diferente no se corrige, se potencia.",
+    fitGuide: "Calce relajado y versátil para uso diario.",
+    stockStatus: "Disponible para envío inmediato.",
+    features: [
+      "Base negra minimalista.",
+      "Intervenciones azules en pierna y bolsillo trasero.",
+      "Cintura elastizada con ajuste.",
+      "Silueta cómoda y versátil.",
+    ],
+    composition: [
+      { label: "Exterior", value: "Gabardina liviana de tacto suave" },
+      { label: "Calce", value: "Relaxed fit de uso urbano" },
+      { label: "Detalle", value: "Intervenciones azules de alto contraste" },
+    ],
+    care: [
+      "Lavar con agua fría y colores similares.",
+      "No usar blanqueador.",
+      "Secar a la sombra.",
+    ],
+    shipping: [
+      {
+        title: "Envíos a todo el país",
+        description: "Gratis a partir de $80.000. Entrega estimada de 2 a 5 días hábiles.",
+      },
+      {
+        title: "Retiro en showroom",
+        description: "Podés retirar coordinando previamente por mensaje.",
+      },
+    ],
+    payments: [
+      "Hasta 3 cuotas sin interés con tarjetas seleccionadas.",
+      "Transferencia bancaria.",
+      "Mercado Pago y billeteras virtuales.",
+    ],
+    sizes: ["M", "L", "XXL"],
+    images: [fragmento01Front, fragmento01Detail, fragmento01Back],
+    image: fragmento01Front,
+    categories: [{ id: "shorts", name: "Shorts" }],
   },
   {
-    id: "producto-2",
-
-    name: "Shark Hoodie",
-    price: 2799.00,
-    image: image2,
+    id: "patch-m4rs",
+    sku: "M4-PATCH-01",
+    name: "PATCH - M4RS",
+    slug: "patch-m4rs",
+    price: 42000,
+    compareAtPrice: null,
+    discountPercentage: 0,
+    installmentInfo: "3 cuotas sin interés de $14.000 con tarjetas seleccionadas.",
+    description:
+      "PATCH es la línea permanente de reconfiguración de M4RS. Construida a partir de retazos de denim y telas limitadas, cada pieza nace de la unión de fragmentos distintos. Cada pieza es única. Cada combinación es irrepetible. Etiqueta M4RS en un lado. Hebilla metálica y módulos de cinta en el otro. Mini formato. Identidad máxima. PATCH no recicla. Reconfigura.",
+    fitGuide: "",
+    stockStatus: "Pieza única disponible.",
+    features: [
+      "Construida a partir de retazos de denim y telas limitadas.",
+      "Cada combinación es irrepetible.",
+      "Etiqueta M4RS en un lado.",
+      "Hebilla metálica y módulos de cinta en el otro.",
+    ],
+    composition: [
+      { label: "Exterior", value: "Denim y textiles de edición limitada" },
+      { label: "Formato", value: "Mini bag de uso diario" },
+      { label: "Herrajes", value: "Hebilla metálica y módulos de cinta" },
+    ],
+    care: [
+      "Limpiar con paño húmedo.",
+      "No lavar a máquina.",
+      "Guardar en lugar seco y ventilado.",
+    ],
+    shipping: [
+      {
+        title: "Envíos a todo el país",
+        description: "Entrega estimada de 2 a 5 días hábiles según destino.",
+      },
+    ],
+    payments: [
+      "Hasta 3 cuotas sin interés con tarjetas seleccionadas.",
+      "Transferencia bancaria.",
+      "Mercado Pago y billeteras virtuales.",
+    ],
+    sizes: [],
+    images: [patchFront, patchDetail, patchSide],
+    image: patchFront,
+    categories: [{ id: "accessories", name: "Accesorios" }],
   },
-  {
-    id: "producto-3",
-    name: "Corduroy Shirt",
-    price: 2799.00,
-    image: image3,
-  },
-  {
-    id: "producto-4",
-
-
-    name: "Camo Jacket",
-    price: 2799.00,
-    image: image4,
-  },
+ 
+  
 ];
 
-export const productoDestacado = {
-  id: "producto-149",
-  sku: "M4-149",
-  name: "Campera Nebula Softshell",
-  price: 89999,
-  compareAtPrice: 109999,
-  discountPercentage: 18,
-  installmentInfo: "3 cuotas sin interés de $29.999,67 con tarjetas seleccionadas.",
-  description:
-    "Campera técnica confeccionada con tejido softshell de tres capas, interior térmico y exterior con tratamiento repelente al agua. Diseñada para climas fríos urbanos, combina aislamiento, respirabilidad y un perfil minimalista inspirado en la estética techwear.",
-  fitGuide: "El modelo mide 1,78 m, pesa 74 kg y usa talle M.",
-  stockStatus: "Disponible para envío inmediato.",
-  features: [
-    "Membrana impermeable 10K / respirable 5K.",
-    "Interiores termo sellados y cierres YKK® resistentes al agua.",
-    "Capucha ergonómica con ajuste tridireccional y visera rígida.",
-    "Bolsillos internos con media malla y salida para cable.",
-  ],
-  composition: [
-    { label: "Exterior", value: "100% poliéster con acabado DWR" },
-    { label: "Interior", value: "Forro micro polar térmico" },
-    { label: "Peso", value: "620 g (talle M)" },
-  ],
-  care: [
-    "Lavar a mano o en ciclo delicado con agua fría.",
-    "No usar blanqueadores ni suavizantes.",
-    "Secar a la sombra y no planchar.",
-  ],
-  shipping: [
-    {
-      title: "Envíos a todo el país",
-      description: "Gratis a partir de $80.000. Entregas 24-72 hs en CABA y GBA.",
-    },
-    {
-      title: "Retiro en tienda",
-      description: "Disponible en nuestro showroom de Palermo con cita previa.",
-    },
-  ],
-  payments: [
-    "Hasta 6 cuotas fijas con tarjeta Visa, Mastercard y Amex.",
-    "Transferencia bancaria con 10% off adicional.",
-    "Pagá con Mercado Pago o MODO.",
-  ],
-  sizes: ["S", "M", "L", "XL"],
-  images: [image2, image3],
-  categories: [{ id: "outerwear", name: "Abrigos" }],
-};
+export const productoDestacado = productos[0];
+
+export const promoGallery = [galery1, galery2];
+
+export const getProductById = (id) =>
+  productos.find((product) => product.id === id);

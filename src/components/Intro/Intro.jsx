@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import styles from "./Intro.module.css";
 import ghostLogo from "../../assets/marcian.png";
 
-const Intro = ({ duration = 5600, onComplete = () => {} }) => {
+const Intro = ({ duration = 3500, onComplete = () => {} }) => {
   const [isVisible, setIsVisible] = useState(true);
   const [isFading, setIsFading] = useState(false);
   const [typedTagline, setTypedTagline] = useState("");

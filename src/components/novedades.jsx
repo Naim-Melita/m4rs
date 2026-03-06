@@ -1,19 +1,18 @@
-import "swiper/css";
 import CardProduct from "./cardProduct";
-import useCarritoStore from "../hooks/useCarritoStore";
 
 const Novedades = ({ productos }) => {
-
   return (
     <section className="py-10">
-      <h2 className="text-3xl font-bold mb-6 uppercase text-black text-center">
+      <h2 className="mb-6 text-center text-3xl font-bold uppercase text-black">
         Novedades
       </h2>
 
-      <div className="flex justify-center">
-        <div className="grid container grid-cols-1 md:grid-cols-4 justify-center place-items-center">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto grid max-w-5xl grid-cols-1 gap-10 md:grid-cols-2">
           {productos.map((item) => (
-           <CardProduct key={item.name} product={item} />
+            <div key={item.id} className="flex justify-center">
+              <CardProduct product={item} />
+            </div>
           ))}
         </div>
       </div>
