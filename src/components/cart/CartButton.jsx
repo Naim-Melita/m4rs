@@ -13,7 +13,7 @@ export default function CartButton({
   );
 
   const baseClass =
-    "relative flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#840c4a]/70";
+    "relative flex items-center justify-center bg-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#840c4a]/70";
 
   return (
     <button
