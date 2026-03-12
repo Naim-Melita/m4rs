@@ -2,6 +2,7 @@
 
 import { X, Plus, Minus, Trash2 } from "lucide-react";
 import { useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import useCartStore from "../../hooks/useCarritoStore"; // o "@/stores/useCartStore"
 import { getDiscount } from "../../utils/getDiscount";
 
@@ -144,20 +145,20 @@ export default function CartDropdown({ open, onClose, anchorRight = true }) {
           <span className="font-semibold">{formatCurrency(total)}</span>
         </div>
         <div className="mt-3 flex gap-2">
-          <p
-            href="/carrito"
-            className="flex-1 h-10 inline-flex items-center justify-center bg-neutral-100 text-neutral-800 cursor-pointer ring-1 ring-neutral-300 hover:bg-white"
+          <Link
+            to="/carrito"
+            className="flex-1 h-10 inline-flex items-center justify-center bg-neutral-100 text-neutral-800 cursor-pointer ring-1 ring-neutral-300 hover:bg-white no-underline"
             onClick={onClose}
           >
             Ver carrito
-          </p>
-          <p
-            href="/checkout"
-            className="flex-1 h-10 inline-flex items-center justify-center  bg-black cursor-pointer text-white hover:opacity-90"
+          </Link>
+          <Link
+            to="/checkout"
+            className="flex-1 h-10 inline-flex items-center justify-center bg-black cursor-pointer text-white hover:opacity-90 no-underline"
             onClick={onClose}
           >
             Comprar
-          </p>
+          </Link>
         </div>
         <button
           onClick={() => {
