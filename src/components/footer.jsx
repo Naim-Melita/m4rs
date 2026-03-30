@@ -1,49 +1,63 @@
 const Footer = () => {
   return (
-    <footer className="bg-black text-white text-sm">
-      <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-4 gap-10">
-        
-        {/* Explore */}
+    <footer
+      className="mt-16 text-sm"
+      style={{ background: "var(--footer-bg)", color: "var(--footer-text)" }}
+    >
+      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-6 py-12 md:grid-cols-4">
         <div>
-          <h4 className="uppercase font-semibold mb-4 tracking-wide">Explore</h4>
+          <h4 className="mb-4 uppercase tracking-[0.3em] text-[var(--accent)]">
+            Explore
+          </h4>
           <ul className="space-y-2">
-            <li><a href="#" className="text-gray-400 hover:text-white no-underline">Hombres</a></li>
-            <li><a href="#" className="text-gray-400 hover:text-white no-underline">Mujeres</a></li>
-            <li><a href="#" className="text-gray-400 hover:text-white no-underline">Niños</a></li>
-            <li><a href="#" className="text-gray-400 hover:text-white no-underline">Estilo de vida</a></li>
-            <li><a href="#" className="text-gray-400 hover:text-white no-underline">Noticias</a></li>
-            <li><a href="#" className="text-gray-400 hover:text-white no-underline">Galería</a></li>
+            {["Hombres", "Mujeres", "Niños", "Estilo de vida", "Noticias", "Galería"].map((item) => (
+              <li key={item}>
+                <a href="#" className="no-underline transition hover:text-[var(--accent)]">
+                  {item}
+                </a>
+              </li>
+            ))}
           </ul>
         </div>
 
-        {/* Atención al Cliente */}
         <div>
-          <h4 className="uppercase font-semibold mb-4 tracking-wide">Atención al Cliente</h4>
+          <h4 className="mb-4 uppercase tracking-[0.3em] text-[var(--accent)]">
+            Atención
+          </h4>
           <ul className="space-y-2">
-            <li><a href="#" className="text-gray-400 hover:text-white no-underline">Contáctenos</a></li>
-            <li><a href="#" className="text-gray-400 hover:text-white no-underline">Envíos</a></li>
-            <li><a href="#" className="text-gray-400 hover:text-white no-underline">Política de Devoluciones</a></li>
-            <li><a href="#" className="text-gray-400 hover:text-white no-underline">Política de Privacidad</a></li>
-            <li><a href="#" className="text-gray-400 hover:text-white no-underline">Política de Cookies</a></li>
-            <li><a href="#" className="text-gray-400 hover:text-white no-underline">Términos y Condiciones</a></li>
+            {[
+              "Contáctenos",
+              "Envíos",
+              "Política de Devoluciones",
+              "Política de Privacidad",
+              "Política de Cookies",
+              "Términos y Condiciones",
+            ].map((item) => (
+              <li key={item}>
+                <a href="#" className="no-underline transition hover:text-[var(--accent)]">
+                  {item}
+                </a>
+              </li>
+            ))}
           </ul>
         </div>
 
-        {/* Suscripción */}
         <div className="md:col-span-2">
-          <h4 className="uppercase font-semibold mb-4 tracking-wide">Suscríbete</h4>
-          <p className="text-gray-400 mb-4">
-            Únete a nuestra lista de correo para recibir novedades y lanzamientos exclusivos.
+          <h4 className="mb-4 uppercase tracking-[0.3em] text-[var(--accent)]">
+            Suscribite
+          </h4>
+          <p className="max-w-xl text-[var(--footer-text)]">
+            Recibí lanzamientos, cápsulas y cambios de sistema antes que nadie.
           </p>
-          <form className="flex flex-col sm:flex-row gap-3">
+          <form className="mt-5 flex flex-col gap-3 sm:flex-row">
             <input
               type="email"
-              placeholder="Únete a nuestra lista de correo"
-              className="flex-1 px-4 py-2 text-black rounded-sm focus:outline-none"
+              placeholder="Tu email"
+              className="theme-input h-12 flex-1 rounded-full px-5"
             />
             <button
               type="submit"
-              className="bg-white text-black px-6 py-2 uppercase font-semibold hover:bg-gray-200 transition"
+              className="theme-button-primary h-12 rounded-full px-6 text-sm font-semibold uppercase tracking-wide"
             >
               Suscribirme
             </button>
@@ -51,31 +65,26 @@ const Footer = () => {
         </div>
       </div>
 
-      {/* Idioma y Moneda */}
-      <div className="max-w-7xl mx-auto px-6 py-6 flex flex-col sm:flex-row justify-between items-center border-t border-gray-800">
-        <div className="flex gap-6 text-gray-400 text-xs uppercase">
-          <button className="hover:text-white">Español</button>
-          <button className="hover:text-white">ARS$</button>
+      <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 border-t px-6 py-6 text-xs uppercase md:flex-row">
+        <div className="flex gap-6">
+          <button className="transition hover:text-[var(--accent)]">Español</button>
+          <button className="transition hover:text-[var(--accent)]">ARS$</button>
         </div>
-        <div className="flex gap-4 mt-4 sm:mt-0 text-gray-400">
-          <a href="#" className="hover:text-white no-underline">Instagram</a>
-          <a href="#" className="hover:text-white no-underline">TikTok</a>
-          <a href="#" className="hover:text-white no-underline">YouTube</a>
+        <div className="flex gap-4">
+          <a href="#" className="no-underline transition hover:text-[var(--accent)]">
+            Instagram
+          </a>
+          <a href="#" className="no-underline transition hover:text-[var(--accent)]">
+            TikTok
+          </a>
+          <a href="#" className="no-underline transition hover:text-[var(--accent)]">
+            YouTube
+          </a>
         </div>
       </div>
 
-      {/* Links legales */}
-      <div className="max-w-7xl mx-auto px-6 py-4 flex flex-wrap justify-center gap-6 text-gray-500 text-xs border-t border-gray-800">
-        <a href="#" className="hover:text-white no-underline">Política de reembolso</a>
-        <a href="#" className="hover:text-white no-underline">Política de privacidad</a>
-        <a href="#" className="hover:text-white no-underline">Política de envío</a>
-        <a href="#" className="hover:text-white no-underline">Términos del servicio</a>
-        <a href="#" className="hover:text-white no-underline">Información de contacto</a>
-      </div>
-
-      {/* Copyright */}
-      <div className="text-center text-gray-500 text-xs py-6 border-t border-gray-800">
-        © 2025 M4RS - Tecnología de Shopify
+      <div className="border-t px-6 py-6 text-center text-xs">
+        © 2025 M4RS
       </div>
     </footer>
   );

@@ -48,21 +48,20 @@ export default function CartDropdown({ open, onClose, anchorRight = true }) {
   return (
     <div
       ref={ref}
-      className={`absolute top-full mt-2 w-[360px] max-h-[70vh] overflow-auto  bg-white text-neutral-900 shadow-lg ring-1 ring-neutral-200/60 z-50 ${
+      className={`theme-panel absolute top-full z-50 mt-2 max-h-[70vh] w-[360px] overflow-auto text-[var(--text-main)] ${
         anchorRight ? "right-0" : "left-0"
       }`}
     >
-      <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-200/70">
+      <div className="theme-border flex items-center justify-between border-b px-4 py-3">
         <h3 className="font-semibold text-sm">Tu carrito</h3>
-        <button  className="p-1 rounded hover:bg-neutral-100" aria-label="Cerrar carrito">
+        <button className="theme-panel-soft rounded p-1" aria-label="Cerrar carrito">
           <X onClick={onClose} size={18} />
         </button>
       </div>
 
-      {/* Lista de items */}
-      <ul className="divide-y divide-neutral-200/60">
+      <ul className="theme-border divide-y">
         {items.length === 0 ? (
-          <li className="px-4 py-6 text-sm text-neutral-500">El carrito está vacío</li>
+          <li className="theme-muted px-4 py-6 text-sm">El carrito está vacío</li>
         ) : (
           items.map((it) => {
             const discount = Number(it.discountPercentage ?? 0);
@@ -76,19 +75,19 @@ export default function CartDropdown({ open, onClose, anchorRight = true }) {
                 <img
                   src={it.image ?? "/images/placeholder.jpg"}
                   alt={it.title}
-                  className="w-14 h-14 rounded-lg object-cover bg-neutral-100 ring-1 ring-neutral-200/60"
+                  className="theme-panel-soft h-14 w-14 rounded-lg object-cover"
                 />
                 <div className="min-w-0 flex-1">
                   <div className="text-sm font-medium truncate">{it.title}</div>
-                  <div className="text-xs text-neutral-500 truncate">
+                  <div className="theme-muted text-xs truncate">
                     {it.categories?.map((c) => c.name).join(", ")}
                   </div>
 
                   <div className="mt-2 flex items-center gap-2">
                     {/* Controles cantidad */}
-                    <div className="inline-flex items-center rounded-lg ring-1 ring-neutral-300 overflow-hidden">
+                    <div className="theme-border inline-flex items-center overflow-hidden rounded-lg ring-1">
                       <button
-                        className="h-8 w-8 grid place-items-center hover:bg-neutral-100"
+                        className="h-8 w-8 grid place-items-center transition hover:bg-[var(--accent-soft)]"
                         onClick={() => removeOne(it.id)}
                         aria-label="Disminuir cantidad"
                       >
@@ -96,7 +95,7 @@ export default function CartDropdown({ open, onClose, anchorRight = true }) {
                       </button>
                       <span className="w-8 text-center text-sm font-medium select-none">{it.quantity ?? 1}</span>
                       <button
-                        className="h-8 w-8 grid place-items-center hover:bg-neutral-100"
+                        className="h-8 w-8 grid place-items-center transition hover:bg-[var(--accent-soft)]"
                         onClick={() => addItem(it, 1)}
                         aria-label="Aumentar cantidad"
                       >
@@ -108,24 +107,23 @@ export default function CartDropdown({ open, onClose, anchorRight = true }) {
                     <div className="ml-auto text-right">
                       {hasDiscount ? (
                         <>
-                          <div className="text-xs text-neutral-400 line-through">
+                          <div className="theme-soft-text text-xs line-through">
                             {formatCurrency(it.price ?? 0)} c/u
                           </div>
-                          <div className="text-sm font-semibold text-[#840c4a]">
+                          <div className="theme-accent-text text-sm font-semibold">
                             {formatCurrency(unitPrice)} c/u (-{Math.round(discount)}%)
                           </div>
                         </>
                       ) : (
                         <div className="text-sm font-semibold">{formatCurrency(unitPrice)} c/u</div>
                       )}
-                      <div className="text-xs text-neutral-500">Subtotal {formatCurrency(subtotal)}</div>
+                      <div className="theme-muted text-xs">Subtotal {formatCurrency(subtotal)}</div>
                     </div>
                   </div>
                 </div>
 
-                {/* remove */}
                 <button
-                  className="p-2 rounded-lg text-neutral-500 hover:text-red-600 hover:bg-red-50"
+                  className="theme-muted rounded-lg p-2 transition hover:bg-[var(--danger-soft)] hover:text-red-500"
                   onClick={() => removeItem(it.id)}
                   aria-label="Quitar producto"
                   title="Quitar producto"
@@ -138,23 +136,22 @@ export default function CartDropdown({ open, onClose, anchorRight = true }) {
         )}
       </ul>
 
-      {/* Footer */}
-      <div className="px-4 py-3 border-t border-neutral-200/70">
+      <div className="theme-border border-t px-4 py-3">
         <div className="flex items-center justify-between text-sm">
-          <span className="text-neutral-600">Total</span>
+          <span className="theme-muted">Total</span>
           <span className="font-semibold">{formatCurrency(total)}</span>
         </div>
         <div className="mt-3 flex gap-2">
           <Link
             to="/carrito"
-            className="flex-1 h-10 inline-flex items-center justify-center bg-neutral-100 text-neutral-800 cursor-pointer ring-1 ring-neutral-300 hover:bg-white no-underline"
+            className="theme-button-secondary flex-1 h-10 inline-flex items-center justify-center cursor-pointer no-underline"
             onClick={onClose}
           >
             Ver carrito
           </Link>
           <Link
             to="/checkout"
-            className="flex-1 h-10 inline-flex items-center justify-center bg-black cursor-pointer text-white hover:opacity-90 no-underline"
+            className="theme-button-primary flex-1 h-10 inline-flex items-center justify-center cursor-pointer no-underline"
             onClick={onClose}
           >
             Comprar
@@ -165,7 +162,7 @@ export default function CartDropdown({ open, onClose, anchorRight = true }) {
             clearCart();
             onClose();
           }}
-          className="w-full mt-2 text-xs text-neutral-500 hover:text-neutral-700"
+          className="theme-muted mt-2 w-full text-xs transition hover:text-[var(--accent)]"
         >
           Vaciar carrito
         </button>

@@ -1,9 +1,8 @@
-import image1 from "./assets/image1.jpg";
-import image2 from "./assets/image2.jpg";
-import image3 from "./assets/image3.jpg";
-import image4 from "./assets/image4.jpg";
+
 import galery1 from "./assets/galery1.jpg";
 import galery2 from "./assets/galery2.jpg";
+import galery3 from "./assets/galery3.jpg";
+
 import fragmento01Front from "./assets/products/fragmento01/fragmento01.jpeg";
 import fragmento01Detail from "./assets/products/fragmento01/fragmento01-detalle.jpeg";
 import fragmento01Back from "./assets/products/fragmento01/fragmento02-trasero.jpeg";
@@ -112,7 +111,33 @@ export const productos = [
 
 export const productoDestacado = productos[0];
 
-export const promoGallery = [galery1, galery2];
+export const promoGalleryCards = [
+  {
+    id: "gallery-1",
+    image: galery1,
+    alt: "Look editorial M4RS en primer plano",
+    className: "md:col-span-1",
+    imageClassName: "h-[720px] md:h-[1000px]",
+    overlay: "bg-gradient-to-t from-black/80 via-black/20 to-transparent",
+  },
+  {
+    id: "gallery-2",
+    image: galery2,
+    alt: "Look editorial M4RS en composición completa",
+    className: "md:col-span-1",
+    imageClassName: "h-[720px] md:h-[1000px]",
+    overlay: "",
+  },
+
+   {
+    id: "gallery-2",
+    image: galery3,
+    alt: "Look editorial M4RS en composición completa",
+    className: "md:col-span-1",
+    imageClassName: "h-[720px] md:h-[1000px]",
+    overlay: "",
+  },
+];
 
 export const getProductById = (id) =>
   productos.find((product) => product.id === id);

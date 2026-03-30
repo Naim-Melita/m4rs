@@ -4,7 +4,7 @@ import GlitchIntro from "../components/Intro/IntroGlitch";
 import Novedades from "../components/novedades";
 import Footer from "../components/footer";
 import { productos } from "../data";
-import logo from "../../src/assets/logo2.png";
+import logo from "../../src/assets/logo3.png";
 import PromoSection from "../components/galery";
 import Header from "../components/Header"; 
 
@@ -52,11 +52,8 @@ export default function Home() {
 
   return (
     <>
-      {/* Intro animada */}
       <ActiveIntro onComplete={handleIntroComplete} />
-      {/* Header reutilizado */}
       <Header />
-      {/* Hero */}
       <section className="hero">
         <div className="overlay"></div>
         <div
@@ -66,17 +63,17 @@ export default function Home() {
           data-text="M4RS"
         >
           {introFinished && (
-            <img
-              className="w-1/2 mx-auto md:w-full"
-              src={logo}
-              alt="logo"
-              data-aos="flip-up"
-            />
+            <div className="hero-logo-reveal">
+              <img
+                className="hero-logo-image w-1/2 mx-auto md:w-2/4"
+                src={logo}
+                alt="logo"
+              />
+            </div>
           )}
         </div>
       </section>
-      {/* Contenido principal */}
-      <main>
+      <main className="theme-page">
         <div>
           <Novedades productos={productos} />
         </div>

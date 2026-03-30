@@ -92,23 +92,23 @@ export default function CheckoutPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white text-neutral-900">
+    <div className="theme-page min-h-screen">
       <Header darkOnTop />
       <main className="pb-16 pt-28">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           {items.length === 0 ? (
             <section className="grid min-h-[60vh] place-items-center">
-              <div className="max-w-xl rounded-[2rem] border border-neutral-200 bg-neutral-50 p-10 text-center">
+              <div className="theme-panel max-w-xl rounded-[2rem] p-10 text-center">
                 <h1 className="text-3xl font-semibold tracking-tight">
                   No hay productos para pagar
                 </h1>
-                <p className="mt-4 text-sm leading-relaxed text-neutral-500">
+                <p className="theme-muted mt-4 text-sm leading-relaxed">
                   Tu carrito está vacío. Agregá productos antes de pasar al
                   checkout.
                 </p>
                 <Link
                   to="/"
-                  className="mt-8 inline-flex rounded-full bg-black px-6 py-3 text-sm font-semibold uppercase tracking-wide text-white no-underline transition hover:bg-neutral-900"
+                  className="theme-button-primary mt-8 inline-flex rounded-full px-6 py-3 text-sm font-semibold uppercase tracking-wide no-underline"
                 >
                   Explorar productos
                 </Link>
@@ -117,18 +117,19 @@ export default function CheckoutPage() {
           ) : (
             <section className="grid gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(320px,0.8fr)]">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.35em] text-neutral-400">
+                <p className="theme-eyebrow text-xs font-semibold uppercase tracking-[0.35em]">
                   M4RS
                 </p>
                 <h1 className="mt-3 text-3xl font-semibold tracking-tight md:text-5xl">
                   Checkout
                 </h1>
-                <p className="mt-3 max-w-2xl text-sm text-neutral-500 md:text-base">
-                  Completá tus datos para cerrar el pedido con el mismo lenguaje
-                  limpio y directo del resto del sitio.
+                <p className="theme-muted mt-3 max-w-2xl text-sm md:text-base">
+                  Completá tus datos para cerrar el pedido manteniendo la misma
+                  identidad visual en ambos modos.
                 </p>
+
                 {!whatsappNumber ? (
-                  <p className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                  <p className="mt-4 rounded-2xl border border-[var(--border-strong)] bg-[var(--accent-soft)] px-4 py-3 text-sm text-[var(--text-main)]">
                     No hay un número configurado en `VITE_WHATSAPP_NUMBER`. Se
                     abrirá WhatsApp con el mensaje precargado para compartirlo.
                   </p>
@@ -137,7 +138,7 @@ export default function CheckoutPage() {
                 <form onSubmit={handleSubmit} className="mt-8 space-y-5">
                   <div className="grid gap-5 md:grid-cols-2">
                     <label className="block">
-                      <span className="mb-2 block text-xs font-semibold uppercase tracking-wide text-neutral-500">
+                      <span className="theme-muted mb-2 block text-xs font-semibold uppercase tracking-wide">
                         Nombre completo
                       </span>
                       <input
@@ -145,11 +146,11 @@ export default function CheckoutPage() {
                         name="fullName"
                         value={formData.fullName}
                         onChange={handleChange}
-                        className="h-12 w-full rounded-2xl border border-neutral-300 px-4 text-sm outline-none transition focus:border-neutral-800"
+                        className="theme-input h-12 w-full rounded-2xl px-4 text-sm transition"
                       />
                     </label>
                     <label className="block">
-                      <span className="mb-2 block text-xs font-semibold uppercase tracking-wide text-neutral-500">
+                      <span className="theme-muted mb-2 block text-xs font-semibold uppercase tracking-wide">
                         Email
                       </span>
                       <input
@@ -158,14 +159,14 @@ export default function CheckoutPage() {
                         name="email"
                         value={formData.email}
                         onChange={handleChange}
-                        className="h-12 w-full rounded-2xl border border-neutral-300 px-4 text-sm outline-none transition focus:border-neutral-800"
+                        className="theme-input h-12 w-full rounded-2xl px-4 text-sm transition"
                       />
                     </label>
                   </div>
 
                   <div className="grid gap-5 md:grid-cols-2">
                     <label className="block">
-                      <span className="mb-2 block text-xs font-semibold uppercase tracking-wide text-neutral-500">
+                      <span className="theme-muted mb-2 block text-xs font-semibold uppercase tracking-wide">
                         Teléfono
                       </span>
                       <input
@@ -173,11 +174,11 @@ export default function CheckoutPage() {
                         name="phone"
                         value={formData.phone}
                         onChange={handleChange}
-                        className="h-12 w-full rounded-2xl border border-neutral-300 px-4 text-sm outline-none transition focus:border-neutral-800"
+                        className="theme-input h-12 w-full rounded-2xl px-4 text-sm transition"
                       />
                     </label>
                     <label className="block">
-                      <span className="mb-2 block text-xs font-semibold uppercase tracking-wide text-neutral-500">
+                      <span className="theme-muted mb-2 block text-xs font-semibold uppercase tracking-wide">
                         Dirección
                       </span>
                       <input
@@ -185,13 +186,13 @@ export default function CheckoutPage() {
                         name="address"
                         value={formData.address}
                         onChange={handleChange}
-                        className="h-12 w-full rounded-2xl border border-neutral-300 px-4 text-sm outline-none transition focus:border-neutral-800"
+                        className="theme-input h-12 w-full rounded-2xl px-4 text-sm transition"
                       />
                     </label>
                   </div>
 
                   <label className="block">
-                    <span className="mb-2 block text-xs font-semibold uppercase tracking-wide text-neutral-500">
+                    <span className="theme-muted mb-2 block text-xs font-semibold uppercase tracking-wide">
                       Notas del pedido
                     </span>
                     <textarea
@@ -199,14 +200,14 @@ export default function CheckoutPage() {
                       rows="5"
                       value={formData.notes}
                       onChange={handleChange}
-                      className="w-full rounded-[1.5rem] border border-neutral-300 px-4 py-3 text-sm outline-none transition focus:border-neutral-800"
+                      className="theme-input w-full rounded-[1.5rem] px-4 py-3 text-sm transition"
                       placeholder="Opcional: horarios, aclaraciones o referencias de entrega."
                     />
                   </label>
 
                   <button
                     type="submit"
-                    className="inline-flex h-12 w-full items-center justify-center rounded-full bg-black px-6 text-sm font-semibold uppercase tracking-wide text-white transition hover:bg-neutral-900"
+                    className="theme-button-primary inline-flex h-12 w-full items-center justify-center rounded-full px-6 text-sm font-semibold uppercase tracking-wide"
                   >
                     Confirmar pedido
                   </button>
@@ -214,8 +215,8 @@ export default function CheckoutPage() {
               </div>
 
               <aside className="lg:sticky lg:top-28">
-                <div className="rounded-[2rem] border border-neutral-200 bg-neutral-50 p-6 shadow-sm shadow-neutral-100">
-                  <h2 className="text-xl font-semibold text-neutral-900">
+                <div className="theme-panel rounded-[2rem] p-6">
+                  <h2 className="text-xl font-semibold text-[var(--text-main)]">
                     Resumen del pedido
                   </h2>
 
@@ -230,7 +231,7 @@ export default function CheckoutPage() {
                       return (
                         <div
                           key={item.id}
-                          className="flex items-center gap-3 rounded-2xl bg-white p-3 ring-1 ring-neutral-200/70"
+                          className="theme-panel-soft flex items-center gap-3 rounded-2xl p-3"
                         >
                           <img
                             src={item.image}
@@ -238,14 +239,14 @@ export default function CheckoutPage() {
                             className="h-16 w-16 rounded-xl object-cover"
                           />
                           <div className="min-w-0 flex-1">
-                            <p className="truncate text-sm font-semibold text-neutral-900">
+                            <p className="truncate text-sm font-semibold text-[var(--text-main)]">
                               {item.title}
                             </p>
-                            <p className="mt-1 text-xs text-neutral-500">
+                            <p className="theme-muted mt-1 text-xs">
                               Cantidad {quantity}
                             </p>
                           </div>
-                          <p className="text-sm font-semibold text-neutral-900">
+                          <p className="text-sm font-semibold text-[var(--text-main)]">
                             {formatCurrency(unitPrice * quantity)}
                           </p>
                         </div>
@@ -253,36 +254,36 @@ export default function CheckoutPage() {
                     })}
                   </div>
 
-                  <div className="mt-6 space-y-4 border-t border-neutral-200 pt-5 text-sm text-neutral-600">
+                  <div className="theme-muted theme-border mt-6 space-y-4 border-t pt-5 text-sm">
                     <div className="flex items-center justify-between">
                       <span>Subtotal</span>
-                      <span className="font-medium text-neutral-900">
+                      <span className="font-medium text-[var(--text-main)]">
                         {formatCurrency(subtotal)}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span>Envío</span>
-                      <span className="font-medium text-neutral-900">
+                      <span className="font-medium text-[var(--text-main)]">
                         {shipping === 0 ? "Gratis" : formatCurrency(shipping)}
                       </span>
                     </div>
-                    <div className="flex items-center justify-between text-base font-semibold text-neutral-900">
+                    <div className="flex items-center justify-between text-base font-semibold text-[var(--text-main)]">
                       <span>Total</span>
                       <span>{formatCurrency(total)}</span>
                     </div>
                   </div>
 
-                  <div className="mt-6 space-y-3 text-sm text-neutral-600">
-                    <div className="flex items-start gap-3 rounded-2xl bg-white p-4 ring-1 ring-neutral-200/70">
-                      <CreditCard className="mt-0.5 size-4 text-neutral-900" />
+                  <div className="theme-muted mt-6 space-y-3 text-sm">
+                    <div className="theme-panel-soft flex items-start gap-3 rounded-2xl p-4">
+                      <CreditCard className="mt-0.5 size-4 text-[var(--accent)]" />
                       <p>Pagos protegidos y cuotas con tarjetas seleccionadas.</p>
                     </div>
-                    <div className="flex items-start gap-3 rounded-2xl bg-white p-4 ring-1 ring-neutral-200/70">
-                      <MapPin className="mt-0.5 size-4 text-neutral-900" />
+                    <div className="theme-panel-soft flex items-start gap-3 rounded-2xl p-4">
+                      <MapPin className="mt-0.5 size-4 text-[var(--accent)]" />
                       <p>Envíos a todo el país con seguimiento del pedido.</p>
                     </div>
-                    <div className="flex items-start gap-3 rounded-2xl bg-white p-4 ring-1 ring-neutral-200/70">
-                      <ShieldCheck className="mt-0.5 size-4 text-neutral-900" />
+                    <div className="theme-panel-soft flex items-start gap-3 rounded-2xl p-4">
+                      <ShieldCheck className="mt-0.5 size-4 text-[var(--accent)]" />
                       <p>Tu información queda contenida dentro del flujo del sitio.</p>
                     </div>
                   </div>

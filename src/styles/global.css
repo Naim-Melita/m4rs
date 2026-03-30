@@ -9,7 +9,8 @@
 body {
   margin: 0;
   font-family: "NohemiVar", sans-serif;
-  background-color: white; 
+  background-color: transparent;
+  color: var(--text-main);
 }
 
 /* === HEADER === */
@@ -63,23 +64,79 @@ body {
 .hero {
   position: relative;
   height: 100vh;
-  background: url('/modelo2.png') center/cover no-repeat;
+  background: url('/hero.png');
   display: flex;
   flex-direction: column;
   align-items: center;
+  background-size: contain;
   justify-content: center;
 }
 
 .overlay {
   position: absolute;
   inset: 0;
-  background: rgba(0,0,0,0.5);
+  background: var(--hero-overlay);
 }
 
 .hero-logo {
   font-weight: bold;
   color: white;
   transition: all 0.8s ease;
+}
+
+.hero-logo-reveal {
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.hero-logo-image {
+  display: block;
+  transform-origin: left center;
+  animation: heroLogoReveal 1.05s cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: clip-path, transform, opacity;
+}
+
+.hero-logo-reveal::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(7, 7, 7, 0.9) 0%,
+    rgba(7, 7, 7, 0.72) 58%,
+    rgba(7, 7, 7, 0) 100%
+  );
+  animation: heroLogoShutter 1.05s cubic-bezier(0.22, 1, 0.36, 1) both;
+  pointer-events: none;
+}
+
+@keyframes heroLogoReveal {
+  0% {
+    opacity: 0;
+    clip-path: inset(0 100% 0 0);
+    transform: translateX(-20px);
+  }
+
+  55% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+    transform: translateX(0);
+  }
+}
+
+@keyframes heroLogoShutter {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(102%);
+  }
 }
 
 
@@ -97,11 +154,11 @@ body {
 
 
 footer a {
-  color: #ccc;
+  color: var(--footer-text);
   text-decoration: none;
   transition: color 0.3s ease;
 }
 
 footer a:hover {
-  color: #fff;
+  color: var(--accent);
 }
