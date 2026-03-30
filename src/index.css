@@ -13,7 +13,6 @@ html {
   --bg-soft: rgba(255, 255, 255, 0.62);
   --bg-input: rgba(255, 255, 255, 0.9);
   --bg-inverse: #08141b;
-  --bg-inverse-hover: #0e212d;
   --text-main: #09131a;
   --text-muted: #48606e;
   --text-soft: #708997;
@@ -83,9 +82,7 @@ a {
 
 body {
   margin: 0;
-  background:
-    radial-gradient(circle at top left, var(--accent-soft), transparent 30%),
-    linear-gradient(180deg, var(--bg-page) 0%, var(--bg-page-alt) 100%);
+  background: var(--bg-page);
   color: var(--text-main);
   transition:
     background-color 220ms ease,
@@ -96,6 +93,52 @@ body {
 #root {
   min-height: 100vh;
   background: transparent;
+}
+
+.app-shell {
+  position: relative;
+  min-height: 100vh;
+  isolation: isolate;
+}
+
+.app-content {
+  position: relative;
+  z-index: 1;
+}
+
+.starfield {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.starfield-item {
+  position: absolute;
+  object-fit: contain;
+  animation-name: starPulse;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+  will-change: opacity, transform;
+}
+
+@keyframes starPulse {
+  0% {
+    opacity: 0.18;
+    transform: rotate(var(--star-rotate)) scale(0.8);
+  }
+
+  50% {
+    opacity: 0.82;
+    transform: rotate(var(--star-rotate)) scale(1.05);
+  }
+
+  100% {
+    opacity: 0.12;
+    transform: rotate(var(--star-rotate)) scale(0.78);
+  }
 }
 
 h1 {

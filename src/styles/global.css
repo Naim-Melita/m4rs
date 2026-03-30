@@ -76,9 +76,16 @@ body {
   position: absolute;
   inset: 0;
   background: var(--hero-overlay);
+  z-index: 0;
+}
+
+.hero-starfield {
+  z-index: 1;
 }
 
 .hero-logo {
+  position: relative;
+  z-index: 2;
   font-weight: bold;
   color: white;
   transition: all 0.8s ease;

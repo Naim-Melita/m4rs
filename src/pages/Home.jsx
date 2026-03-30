@@ -7,6 +7,7 @@ import { productos } from "../data";
 import logo from "../../src/assets/logo3.png";
 import PromoSection from "../components/galery";
 import Header from "../components/Header"; 
+import Starfield from "../components/Starfield";
 
 const INTRO_VARIANT = "glitch";
 const introComponents = {
@@ -56,6 +57,17 @@ export default function Home() {
       <Header />
       <section className="hero">
         <div className="overlay"></div>
+        <Starfield
+          className="hero-starfield"
+          count={12}
+          seed={909}
+          sizeMin={18}
+          sizeRange={18}
+          topMin={12}
+          topRange={68}
+          leftMin={6}
+          leftRange={88}
+        />
         <div
           className={`hero-logo  ${scrolled ? "to-header" : ""} ${
             introFinished ? "hero-logo-animated" : ""

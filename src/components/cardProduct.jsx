@@ -25,7 +25,7 @@ const CardProduct = ({ product }) => {
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
           />
         </div>
-        <h3 className="mt-4 text-center text-sm font-normal tracking-wide text-[var(--text-main)]">
+        <h3 className="mt-4 text-center text-lg font-bold tracking-wide text-[var(--text-main)] md:text-xl">
           {name}
         </h3>
         <p className="theme-accent-text mt-2 text-center text-sm font-bold">

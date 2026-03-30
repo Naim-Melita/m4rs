@@ -1,5 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 import ScrollToTop from "./components/ScrollToTop";
+import Starfield from "./components/Starfield";
 import Home from "./pages/Home";
 import Product from "./pages/Product";
 import Cart from "./pages/Cart";
@@ -8,14 +9,17 @@ import "./index.css";
 
 const App = () => {
   return (
-    <div>
+    <div className="app-shell">
+      <Starfield />
       <ScrollToTop />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/producto/:id" element={<Product />} />
-        <Route path="/carrito" element={<Cart />} />
-        <Route path="/checkout" element={<Checkout />} />
-      </Routes>
+      <div className="app-content">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/producto/:id" element={<Product />} />
+          <Route path="/carrito" element={<Cart />} />
+          <Route path="/checkout" element={<Checkout />} />
+        </Routes>
+      </div>
     </div>
   );
 };

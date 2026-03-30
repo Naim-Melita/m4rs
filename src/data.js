@@ -2,6 +2,8 @@
 import galery1 from "./assets/galery1.jpg";
 import galery2 from "./assets/galery2.jpg";
 import galery3 from "./assets/galery3.jpg";
+import galery4 from "./assets/galery4.jpg";
+
 
 import fragmento01Front from "./assets/products/fragmento01/fragmento01.jpeg";
 import fragmento01Detail from "./assets/products/fragmento01/fragmento01-detalle.jpeg";
@@ -14,7 +16,7 @@ export const productos = [
   {
     id: "fragmento-01",
     sku: "M4-FRAG-01",
-    name: "Fragmento 01",
+    name: "Fr4gmento 01",
     slug: "fragmento-01",
     price: 48000,
     compareAtPrice: null,
@@ -61,9 +63,9 @@ export const productos = [
     categories: [{ id: "shorts", name: "Shorts" }],
   },
   {
-    id: "patch-m4rs",
-    sku: "M4-PATCH-01",
-    name: "PATCH - M4RS",
+    id: "duals-m4rs",
+    sku: "M4-DUALS-01",
+    name: "DU4LS",
     slug: "patch-m4rs",
     price: 42000,
     compareAtPrice: null,
@@ -112,6 +114,26 @@ export const productos = [
 export const productoDestacado = productos[0];
 
 export const promoGalleryCards = [
+  
+
+   {
+    id: "gallery-2",
+    image: galery3,
+    alt: "Look editorial M4RS en composición completa",
+    className: "md:col-span-1",
+    imageClassName: "h-[720px] md:h-[1000px]",
+    overlay: "",
+  },
+
+   {
+    id: "gallery-2",
+    image: galery4,
+    alt: "Look editorial M4RS en composición completa",
+    className: "md:col-span-1",
+    imageClassName: "h-[720px] md:h-[1000px]",
+    overlay: "",
+  },
+
   {
     id: "gallery-1",
     image: galery1,
@@ -123,15 +145,6 @@ export const promoGalleryCards = [
   {
     id: "gallery-2",
     image: galery2,
-    alt: "Look editorial M4RS en composición completa",
-    className: "md:col-span-1",
-    imageClassName: "h-[720px] md:h-[1000px]",
-    overlay: "",
-  },
-
-   {
-    id: "gallery-2",
-    image: galery3,
     alt: "Look editorial M4RS en composición completa",
     className: "md:col-span-1",
     imageClassName: "h-[720px] md:h-[1000px]",
