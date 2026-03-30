@@ -59,7 +59,7 @@ export default function Home() {
         <div className="overlay"></div>
         <Starfield
           className="hero-starfield"
-          count={12}
+          count={20}
           seed={909}
           sizeMin={18}
           sizeRange={18}

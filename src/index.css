@@ -117,27 +117,37 @@ body {
 .starfield-item {
   position: absolute;
   object-fit: contain;
+  opacity: 0;
   animation-name: starPulse;
   animation-timing-function: ease-in-out;
   animation-iteration-count: infinite;
-  animation-direction: alternate;
   will-change: opacity, transform;
 }
 
 @keyframes starPulse {
   0% {
-    opacity: 0.18;
-    transform: rotate(var(--star-rotate)) scale(0.8);
+    opacity: 0;
+    transform: rotate(var(--star-rotate)) scale(0.72);
   }
 
-  50% {
-    opacity: 0.82;
+  28% {
+    opacity: 0;
+    transform: rotate(var(--star-rotate)) scale(0.72);
+  }
+
+  52% {
+    opacity: var(--star-opacity);
     transform: rotate(var(--star-rotate)) scale(1.05);
   }
 
+  72% {
+    opacity: 0;
+    transform: rotate(var(--star-rotate)) scale(0.82);
+  }
+
   100% {
-    opacity: 0.12;
-    transform: rotate(var(--star-rotate)) scale(0.78);
+    opacity: 0;
+    transform: rotate(var(--star-rotate)) scale(0.72);
   }
 }
 

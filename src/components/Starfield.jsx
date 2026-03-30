@@ -59,10 +59,10 @@ export default function Starfield({
             left: star.left,
             width: star.size,
             height: star.size,
-            opacity: star.opacity,
             animationDuration: star.duration,
             animationDelay: star.delay,
             "--star-rotate": star.rotation,
+            "--star-opacity": star.opacity,
           }}
         />
       ))}
