@@ -1,10 +1,18 @@
-import { useMemo, useState } from "react";
-import { CreditCard, MapPin, ShieldCheck } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { ShoppingBag } from "lucide-react";
 import Header from "../components/Header";
 import Footer from "../components/footer";
+import AuthModal from "../components/auth/AuthModal";
 import useCartStore from "../hooks/useCarritoStore";
 import { getDiscount } from "../utils/getDiscount";
+import { useAuth } from "../context/AuthContext";
+import { updateProfile } from "../api/auth";
+
+// ── MP (comentado hasta terminar integración) ──────────────
+// import PaymentBrick from "../components/checkout/PaymentBrick";
+// import WalletBrick  from "../components/checkout/WalletBrick";
+// import { processPayment } from "../api/payments";
 
 const formatCurrency = (value) =>
   new Intl.NumberFormat("es-AR", {
@@ -13,286 +21,348 @@ const formatCurrency = (value) =>
     maximumFractionDigits: 0,
   }).format(value);
 
+const inputClass =
+  "w-full border-b border-[var(--border)] bg-transparent py-3 text-sm text-[var(--text-main)] placeholder:text-[var(--text-soft)] outline-none transition-colors focus:border-[var(--text-main)]";
+
+const Field = ({ label, children }) => (
+  <label className="block">
+    <span className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.35em] text-[var(--text-soft)]">
+      {label}
+    </span>
+    {children}
+  </label>
+);
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 export default function CheckoutPage() {
-  const items = useCartStore((state) => state.items ?? []);
-  const clearCart = useCartStore((state) => state.clearCart);
-  const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    phone: "",
-    address: "",
-    notes: "",
+  const { user, loading: authLoading } = useAuth();
+  const [authOpen, setAuthOpen] = useState(false);
+
+  const items    = useCartStore((s) => s.items ?? []);
+  const clearCart = useCartStore((s) => s.clearCart);
+
+  const [contact, setContact] = useState({
+    firstName: user?.firstName ?? "",
+    lastName:  user?.lastName  ?? "",
+    email:     user?.email     ?? "",
+    phone:     user?.phone     ?? "",
+    address:   user?.address   ?? "",
+    notes:     "",
   });
+
+  // Cuando el usuario termina de cargar, rellena el form con sus datos
+  useEffect(() => {
+    if (!user) return;
+    setContact((prev) => ({
+      firstName: prev.firstName || user.firstName || "",
+      lastName:  prev.lastName  || user.lastName  || "",
+      email:     prev.email     || user.email     || "",
+      phone:     prev.phone     || user.phone     || "",
+      address:   prev.address   || user.address   || "",
+      notes:     prev.notes,
+    }));
+  }, [user]);
+
+  const handleChange = (e) =>
+    setContact((p) => ({ ...p, [e.target.name]: e.target.value }));
 
   const subtotal = useMemo(
     () =>
       items.reduce((sum, item) => {
-        const price = getDiscount(
-          item.price ?? 0,
-          Number(item.discountPercentage ?? 0)
-        );
+        const price = getDiscount(item.price ?? 0, Number(item.discountPercentage ?? 0));
         return sum + price * (item.quantity ?? 1);
       }, 0),
     [items]
   );
 
   const shipping = items.length > 0 && subtotal < 80000 ? 6500 : 0;
-  const total = subtotal + shipping;
+  const total    = subtotal + shipping;
   const whatsappNumber = import.meta.env.VITE_WHATSAPP_NUMBER?.replace(/\D/g, "");
 
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-    setFormData((current) => ({ ...current, [name]: value }));
-  };
-
-  const buildWhatsappMessage = () => {
+  const buildMessage = () => {
     const lines = [
       "Hola M4RS, quiero confirmar este pedido:",
       "",
-      "Cliente:",
-      `Nombre: ${formData.fullName}`,
-      `Email: ${formData.email}`,
-      `Telefono: ${formData.phone}`,
-      `Direccion: ${formData.address}`,
+      `Nombre: ${contact.firstName} ${contact.lastName}`,
+      `Email: ${contact.email}`,
+      `Teléfono: ${contact.phone}`,
+      `Dirección: ${contact.address}`,
     ];
-
-    if (formData.notes.trim()) {
-      lines.push(`Notas: ${formData.notes.trim()}`);
-    }
-
+    if (contact.notes.trim()) lines.push(`Notas: ${contact.notes.trim()}`);
     lines.push("", "Productos:");
-
     items.forEach((item) => {
-      const quantity = item.quantity ?? 1;
-      const unitPrice = getDiscount(
-        item.price ?? 0,
-        Number(item.discountPercentage ?? 0)
-      );
-      const lineTotal = unitPrice * quantity;
-      lines.push(`- ${item.title} x${quantity} | ${formatCurrency(lineTotal)}`);
+      const qty       = item.quantity ?? 1;
+      const unitPrice = getDiscount(item.price ?? 0, Number(item.discountPercentage ?? 0));
+      lines.push(`- ${item.title} x${qty} | ${formatCurrency(unitPrice * qty)}`);
     });
-
-    lines.push("");
-    lines.push(`Subtotal: ${formatCurrency(subtotal)}`);
-    lines.push(`Envio: ${shipping === 0 ? "Gratis" : formatCurrency(shipping)}`);
+    lines.push("", `Subtotal: ${formatCurrency(subtotal)}`);
+    lines.push(`Envío: ${shipping === 0 ? "Gratis" : formatCurrency(shipping)}`);
     lines.push(`Total: ${formatCurrency(total)}`);
-
     return lines.join("\n");
   };
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const message = encodeURIComponent(buildWhatsappMessage());
-    const whatsappUrl = whatsappNumber
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Guardar teléfono y dirección en el perfil
+    updateProfile({
+      firstName: contact.firstName,
+      lastName:  contact.lastName,
+      phone:     contact.phone,
+      address:   contact.address,
+    }).catch(() => {});
+
+    const message = encodeURIComponent(buildMessage());
+    const url = whatsappNumber
       ? `https://wa.me/${whatsappNumber}?text=${message}`
       : `https://wa.me/?text=${message}`;
 
     clearCart();
-    window.location.href = whatsappUrl;
+    window.location.href = url;
   };
 
+  // ── Auth gate ─────────────────────────────────────────────
+  if (!authLoading && !user) {
+    return (
+      <div className="min-h-screen" style={{ background: "var(--bg-page)" }}>
+        <Header darkOnTop />
+        <main className="flex min-h-[70vh] flex-col items-center justify-center px-6 text-center">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.4em] text-[var(--text-soft)]">
+            M4RS
+          </p>
+          <h2 className="mt-3 text-xl font-light text-[var(--text-main)]">
+            Iniciá sesión para continuar
+          </h2>
+          <p className="mt-3 max-w-xs text-xs text-[var(--text-soft)]">
+            Necesitás una cuenta para completar tu compra.
+          </p>
+          <button
+            type="button"
+            onClick={() => setAuthOpen(true)}
+            className="mt-8 border border-[var(--text-main)] bg-[var(--text-main)] px-10 py-3.5 text-[10px] font-semibold uppercase tracking-[0.25em] text-[var(--bg-page)] transition-opacity hover:opacity-80"
+          >
+            Iniciar sesión
+          </button>
+          <Link
+            to="/"
+            className="mt-6 border-b border-[var(--text-soft)] pb-0.5 text-[10px] font-semibold uppercase tracking-[0.35em] text-[var(--text-soft)] no-underline transition-opacity hover:opacity-50"
+          >
+            Volver al inicio
+          </Link>
+        </main>
+        <Footer />
+        <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} />
+      </div>
+    );
+  }
+
+  // ── Carrito vacío ─────────────────────────────────────────
+  if (items.length === 0) {
+    return (
+      <div className="min-h-screen" style={{ background: "var(--bg-page)" }}>
+        <Header darkOnTop />
+        <main className="flex min-h-[70vh] flex-col items-center justify-center px-6 text-center">
+          <ShoppingBag className="mb-6 size-8 text-[var(--text-soft)]" strokeWidth={1} />
+          <p className="text-sm font-light text-[var(--text-muted)]">
+            No hay productos para pagar
+          </p>
+          <Link
+            to="/"
+            className="mt-8 border-b border-[var(--text-main)] pb-0.5 text-[10px] font-semibold uppercase tracking-[0.35em] text-[var(--text-main)] no-underline transition-opacity hover:opacity-50"
+          >
+            Explorar colección
+          </Link>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  // ── Checkout ──────────────────────────────────────────────
   return (
-    <div className="theme-page min-h-screen">
+    <div className="min-h-screen" style={{ background: "var(--bg-page)" }}>
       <Header darkOnTop />
-      <main className="pb-16 pt-28">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          {items.length === 0 ? (
-            <section className="grid min-h-[60vh] place-items-center">
-              <div className="theme-panel max-w-xl rounded-[2rem] p-10 text-center">
-                <h1 className="text-3xl font-semibold tracking-tight">
-                  No hay productos para pagar
-                </h1>
-                <p className="theme-muted mt-4 text-sm leading-relaxed">
-                  Tu carrito está vacío. Agregá productos antes de pasar al
-                  checkout.
-                </p>
-                <Link
-                  to="/"
-                  className="theme-button-primary mt-8 inline-flex rounded-full px-6 py-3 text-sm font-semibold uppercase tracking-wide no-underline"
-                >
-                  Explorar productos
-                </Link>
+
+      <main className="mx-auto max-w-6xl px-6 pb-24 pt-24 sm:px-10 lg:px-16">
+
+        <div className="mb-14">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.4em] text-[var(--text-soft)]">
+            M4RS
+          </p>
+          <h1 className="mt-2 text-2xl font-light tracking-wide text-[var(--text-main)] md:text-3xl">
+            Confirmar pedido
+          </h1>
+        </div>
+
+        <div className="grid gap-16 lg:grid-cols-[1fr_340px] lg:items-start">
+
+          {/* ── Formulario ──────────────────────────────── */}
+          <form onSubmit={handleSubmit} className="space-y-12">
+
+            <div>
+              <p className="mb-8 text-[10px] font-semibold uppercase tracking-[0.4em] text-[var(--text-soft)]">
+                Datos de contacto
+              </p>
+              <div className="grid gap-8 md:grid-cols-2">
+                <Field label="Nombre">
+                  <input
+                    required
+                    name="firstName"
+                    value={contact.firstName}
+                    onChange={handleChange}
+                    className={inputClass}
+                  />
+                </Field>
+                <Field label="Apellido">
+                  <input
+                    required
+                    name="lastName"
+                    value={contact.lastName}
+                    onChange={handleChange}
+                    className={inputClass}
+                  />
+                </Field>
+                <Field label="Email">
+                  <input
+                    required
+                    type="email"
+                    name="email"
+                    value={contact.email}
+                    onChange={handleChange}
+                    className={inputClass}
+                  />
+                </Field>
+                <Field label="Teléfono">
+                  <input
+                    required
+                    name="phone"
+                    value={contact.phone}
+                    onChange={handleChange}
+                    className={inputClass}
+                  />
+                </Field>
+                <Field label="Dirección de entrega">
+                  <input
+                    required
+                    name="address"
+                    value={contact.address}
+                    onChange={handleChange}
+                    className={inputClass}
+                  />
+                </Field>
               </div>
-            </section>
-          ) : (
-            <section className="grid gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(320px,0.8fr)]">
-              <div>
-                <p className="theme-eyebrow text-xs font-semibold uppercase tracking-[0.35em]">
-                  M4RS
+            </div>
+
+            <div>
+              <p className="mb-8 text-[10px] font-semibold uppercase tracking-[0.4em] text-[var(--text-soft)]">
+                Notas del pedido
+              </p>
+              <Field label="Opcional">
+                <textarea
+                  name="notes"
+                  rows={3}
+                  value={contact.notes}
+                  onChange={handleChange}
+                  placeholder="Horarios, aclaraciones o referencias de entrega."
+                  className={`${inputClass} resize-none`}
+                />
+              </Field>
+            </div>
+
+            <div className="space-y-3 border-t border-[var(--border)] pt-8">
+              {[
+                "Envíos a todo el país con seguimiento del pedido.",
+                "Te contactamos para coordinar el pago y la entrega.",
+                "Tu información no sale del flujo del sitio.",
+              ].map((text) => (
+                <p key={text} className="flex items-start gap-3 text-xs text-[var(--text-soft)]">
+                  <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-[var(--text-soft)]" />
+                  {text}
                 </p>
-                <h1 className="mt-3 text-3xl font-semibold tracking-tight md:text-5xl">
-                  Checkout
-                </h1>
-                <p className="theme-muted mt-3 max-w-2xl text-sm md:text-base">
-                  Completá tus datos para cerrar el pedido manteniendo la misma
-                  identidad visual en ambos modos.
-                </p>
+              ))}
+            </div>
 
-                {!whatsappNumber ? (
-                  <p className="mt-4 rounded-2xl border border-[var(--border-strong)] bg-[var(--accent-soft)] px-4 py-3 text-sm text-[var(--text-main)]">
-                    No hay un número configurado en `VITE_WHATSAPP_NUMBER`. Se
-                    abrirá WhatsApp con el mensaje precargado para compartirlo.
-                  </p>
-                ) : null}
+            <button
+              type="submit"
+              className="block w-full border border-[var(--text-main)] bg-[var(--text-main)] py-4 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--bg-page)] transition-opacity hover:opacity-80"
+            >
+              Confirmar pedido vía WhatsApp
+            </button>
+          </form>
 
-                <form onSubmit={handleSubmit} className="mt-8 space-y-5">
-                  <div className="grid gap-5 md:grid-cols-2">
-                    <label className="block">
-                      <span className="theme-muted mb-2 block text-xs font-semibold uppercase tracking-wide">
-                        Nombre completo
-                      </span>
-                      <input
-                        required
-                        name="fullName"
-                        value={formData.fullName}
-                        onChange={handleChange}
-                        className="theme-input h-12 w-full rounded-2xl px-4 text-sm transition"
-                      />
-                    </label>
-                    <label className="block">
-                      <span className="theme-muted mb-2 block text-xs font-semibold uppercase tracking-wide">
-                        Email
-                      </span>
-                      <input
-                        required
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        className="theme-input h-12 w-full rounded-2xl px-4 text-sm transition"
-                      />
-                    </label>
-                  </div>
+          {/* ── Resumen ─────────────────────────────────── */}
+          <aside className="lg:sticky lg:top-24">
+            <p className="mb-6 text-[10px] font-semibold uppercase tracking-[0.4em] text-[var(--text-soft)]">
+              Tu pedido
+            </p>
 
-                  <div className="grid gap-5 md:grid-cols-2">
-                    <label className="block">
-                      <span className="theme-muted mb-2 block text-xs font-semibold uppercase tracking-wide">
-                        Teléfono
-                      </span>
-                      <input
-                        required
-                        name="phone"
-                        value={formData.phone}
-                        onChange={handleChange}
-                        className="theme-input h-12 w-full rounded-2xl px-4 text-sm transition"
-                      />
-                    </label>
-                    <label className="block">
-                      <span className="theme-muted mb-2 block text-xs font-semibold uppercase tracking-wide">
-                        Dirección
-                      </span>
-                      <input
-                        required
-                        name="address"
-                        value={formData.address}
-                        onChange={handleChange}
-                        className="theme-input h-12 w-full rounded-2xl px-4 text-sm transition"
-                      />
-                    </label>
-                  </div>
-
-                  <label className="block">
-                    <span className="theme-muted mb-2 block text-xs font-semibold uppercase tracking-wide">
-                      Notas del pedido
-                    </span>
-                    <textarea
-                      name="notes"
-                      rows="5"
-                      value={formData.notes}
-                      onChange={handleChange}
-                      className="theme-input w-full rounded-[1.5rem] px-4 py-3 text-sm transition"
-                      placeholder="Opcional: horarios, aclaraciones o referencias de entrega."
-                    />
-                  </label>
-
-                  <button
-                    type="submit"
-                    className="theme-button-primary inline-flex h-12 w-full items-center justify-center rounded-full px-6 text-sm font-semibold uppercase tracking-wide"
+            <div className="border-t border-[var(--border)]">
+              {items.map((item) => {
+                const qty       = item.quantity ?? 1;
+                const unitPrice = getDiscount(item.price ?? 0, Number(item.discountPercentage ?? 0));
+                return (
+                  <div
+                    key={item.id}
+                    className="flex items-center gap-4 border-b border-[var(--border)] py-4"
                   >
-                    Confirmar pedido
-                  </button>
-                </form>
+                    <img
+                      src={item.image}
+                      alt={item.title}
+                      className="h-16 w-14 shrink-0 object-cover"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-xs font-medium text-[var(--text-main)]">
+                        {item.title}
+                      </p>
+                      <p className="mt-0.5 text-[10px] text-[var(--text-soft)]">
+                        Cantidad: {qty}
+                      </p>
+                    </div>
+                    <p className="shrink-0 text-xs font-medium text-[var(--text-main)]">
+                      {formatCurrency(unitPrice * qty)}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="mt-6 space-y-3">
+              <div className="flex items-center justify-between text-xs text-[var(--text-muted)]">
+                <span>Subtotal</span>
+                <span>{formatCurrency(subtotal)}</span>
               </div>
+              <div className="flex items-center justify-between text-xs text-[var(--text-muted)]">
+                <span>Envío</span>
+                <span>{shipping === 0 ? "Gratis" : formatCurrency(shipping)}</span>
+              </div>
+            </div>
 
-              <aside className="lg:sticky lg:top-28">
-                <div className="theme-panel rounded-[2rem] p-6">
-                  <h2 className="text-xl font-semibold text-[var(--text-main)]">
-                    Resumen del pedido
-                  </h2>
+            <div className="mt-6 flex items-center justify-between border-t border-[var(--border)] pt-6">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.35em] text-[var(--text-main)]">
+                Total
+              </span>
+              <span className="text-xl font-light text-[var(--text-main)]">
+                {formatCurrency(total)}
+              </span>
+            </div>
 
-                  <div className="mt-6 space-y-4">
-                    {items.map((item) => {
-                      const quantity = item.quantity ?? 1;
-                      const unitPrice = getDiscount(
-                        item.price ?? 0,
-                        Number(item.discountPercentage ?? 0)
-                      );
+            {shipping > 0 && (
+              <p className="mt-3 text-[11px] text-[var(--text-soft)]">
+                Sumá {formatCurrency(80000 - subtotal)} más para envío gratis.
+              </p>
+            )}
 
-                      return (
-                        <div
-                          key={item.id}
-                          className="theme-panel-soft flex items-center gap-3 rounded-2xl p-3"
-                        >
-                          <img
-                            src={item.image}
-                            alt={item.title}
-                            className="h-16 w-16 rounded-xl object-cover"
-                          />
-                          <div className="min-w-0 flex-1">
-                            <p className="truncate text-sm font-semibold text-[var(--text-main)]">
-                              {item.title}
-                            </p>
-                            <p className="theme-muted mt-1 text-xs">
-                              Cantidad {quantity}
-                            </p>
-                          </div>
-                          <p className="text-sm font-semibold text-[var(--text-main)]">
-                            {formatCurrency(unitPrice * quantity)}
-                          </p>
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  <div className="theme-muted theme-border mt-6 space-y-4 border-t pt-5 text-sm">
-                    <div className="flex items-center justify-between">
-                      <span>Subtotal</span>
-                      <span className="font-medium text-[var(--text-main)]">
-                        {formatCurrency(subtotal)}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span>Envío</span>
-                      <span className="font-medium text-[var(--text-main)]">
-                        {shipping === 0 ? "Gratis" : formatCurrency(shipping)}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between text-base font-semibold text-[var(--text-main)]">
-                      <span>Total</span>
-                      <span>{formatCurrency(total)}</span>
-                    </div>
-                  </div>
-
-                  <div className="theme-muted mt-6 space-y-3 text-sm">
-                    <div className="theme-panel-soft flex items-start gap-3 rounded-2xl p-4">
-                      <CreditCard className="mt-0.5 size-4 text-[var(--accent)]" />
-                      <p>Pagos protegidos y cuotas con tarjetas seleccionadas.</p>
-                    </div>
-                    <div className="theme-panel-soft flex items-start gap-3 rounded-2xl p-4">
-                      <MapPin className="mt-0.5 size-4 text-[var(--accent)]" />
-                      <p>Envíos a todo el país con seguimiento del pedido.</p>
-                    </div>
-                    <div className="theme-panel-soft flex items-start gap-3 rounded-2xl p-4">
-                      <ShieldCheck className="mt-0.5 size-4 text-[var(--accent)]" />
-                      <p>Tu información queda contenida dentro del flujo del sitio.</p>
-                    </div>
-                  </div>
-                </div>
-              </aside>
-            </section>
-          )}
+            <Link
+              to="/carrito"
+              className="mt-8 block text-center text-[10px] font-semibold uppercase tracking-[0.3em] text-[var(--text-soft)] no-underline transition-opacity hover:opacity-50"
+            >
+              ← Volver al carrito
+            </Link>
+          </aside>
         </div>
       </main>
+
       <Footer />
     </div>
   );

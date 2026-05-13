@@ -1,38 +1,34 @@
-"use client";
-
-import { X, Plus, Minus, Trash2 } from "lucide-react";
+import { X, Plus, Minus } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import useCartStore from "../../hooks/useCarritoStore"; // o "@/stores/useCartStore"
+import useCartStore from "../../hooks/useCarritoStore";
 import { getDiscount } from "../../utils/getDiscount";
 
 function formatCurrency(n) {
-  return new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 }).format(n);
+  return new Intl.NumberFormat("es-AR", {
+    style: "currency",
+    currency: "ARS",
+    maximumFractionDigits: 0,
+  }).format(n);
 }
 
 export default function CartDropdown({ open, onClose, anchorRight = true }) {
   const ref = useRef(null);
 
-  const items = useCartStore((s) => s.items ?? []);
-  const addItem = useCartStore((s) => s.addItem ?? ((p) => {}));
-  const removeOne = useCartStore((s) => s.removeOne ?? ((id) => {}));
-  const removeItem = useCartStore((s) => s.removeItem ?? ((id) => {}));
-  const clearCart = useCartStore((s) => s.clearCart ?? (() => {}));
+  const items     = useCartStore((s) => s.items ?? []);
+  const addItem   = useCartStore((s) => s.addItem);
+  const removeOne = useCartStore((s) => s.removeOne);
+  const removeItem = useCartStore((s) => s.removeItem);
+  const clearCart = useCartStore((s) => s.clearCart);
 
   const total = items.reduce((sum, it) => {
-    const discount = Number(it.discountPercentage ?? 0);
-    const unitPrice = getDiscount(it.price ?? 0, discount);
+    const unitPrice = getDiscount(it.price ?? 0, Number(it.discountPercentage ?? 0));
     return sum + unitPrice * (it.quantity ?? 1);
   }, 0);
 
-  // cerrar al click afuera / ESC
   useEffect(() => {
-    function handleClick(e) {
-      if (ref.current && !ref.current.contains(e.target)) onClose();
-    }
-    function handleEsc(e) {
-      if (e.key === "Escape") onClose();
-    }
+    const handleClick = (e) => { if (ref.current && !ref.current.contains(e.target)) onClose(); };
+    const handleEsc   = (e) => { if (e.key === "Escape") onClose(); };
     if (open) {
       document.addEventListener("mousedown", handleClick);
       document.addEventListener("keydown", handleEsc);
@@ -48,125 +44,146 @@ export default function CartDropdown({ open, onClose, anchorRight = true }) {
   return (
     <div
       ref={ref}
-      className={`theme-panel absolute top-full z-50 mt-2 max-h-[70vh] w-[360px] overflow-auto text-[var(--text-main)] ${
+      className={`absolute top-full z-50 mt-3 flex w-80 flex-col overflow-hidden border border-[var(--border)] ${
         anchorRight ? "right-0" : "left-0"
       }`}
+      style={{ background: "var(--bg-page)" }}
     >
-      <div className="theme-border flex items-center justify-between border-b px-4 py-3">
-        <h3 className="font-semibold text-sm">Tu carrito</h3>
-        <button className="theme-panel-soft rounded p-1" aria-label="Cerrar carrito">
-          <X onClick={onClose} size={18} />
-        </button>
-      </div>
-
-      <ul className="theme-border divide-y">
-        {items.length === 0 ? (
-          <li className="theme-muted px-4 py-6 text-sm">El carrito está vacío</li>
-        ) : (
-          items.map((it) => {
-            const discount = Number(it.discountPercentage ?? 0);
-            const quantity = it.quantity ?? 1;
-            const hasDiscount = discount > 0;
-            const unitPrice = getDiscount(it.price ?? 0, discount);
-            const subtotal = unitPrice * quantity;
-
-            return (
-              <li key={it.id} className="px-4 py-3 flex items-center gap-3">
-                <img
-                  src={it.image ?? "/images/placeholder.jpg"}
-                  alt={it.title}
-                  className="theme-panel-soft h-14 w-14 rounded-lg object-cover"
-                />
-                <div className="min-w-0 flex-1">
-                  <div className="text-sm font-medium truncate">{it.title}</div>
-                  <div className="theme-muted text-xs truncate">
-                    {it.categories?.map((c) => c.name).join(", ")}
-                  </div>
-
-                  <div className="mt-2 flex items-center gap-2">
-                    {/* Controles cantidad */}
-                    <div className="theme-border inline-flex items-center overflow-hidden rounded-lg ring-1">
-                      <button
-                        className="h-8 w-8 grid place-items-center transition hover:bg-[var(--accent-soft)]"
-                        onClick={() => removeOne(it.id)}
-                        aria-label="Disminuir cantidad"
-                      >
-                        <Minus size={16} />
-                      </button>
-                      <span className="w-8 text-center text-sm font-medium select-none">{it.quantity ?? 1}</span>
-                      <button
-                        className="h-8 w-8 grid place-items-center transition hover:bg-[var(--accent-soft)]"
-                        onClick={() => addItem(it, 1)}
-                        aria-label="Aumentar cantidad"
-                      >
-                        <Plus size={16} />
-                      </button>
-                    </div>
-
-                    {/* precio por unidad y subtotal */}
-                    <div className="ml-auto text-right">
-                      {hasDiscount ? (
-                        <>
-                          <div className="theme-soft-text text-xs line-through">
-                            {formatCurrency(it.price ?? 0)} c/u
-                          </div>
-                          <div className="theme-accent-text text-sm font-semibold">
-                            {formatCurrency(unitPrice)} c/u (-{Math.round(discount)}%)
-                          </div>
-                        </>
-                      ) : (
-                        <div className="text-sm font-semibold">{formatCurrency(unitPrice)} c/u</div>
-                      )}
-                      <div className="theme-muted text-xs">Subtotal {formatCurrency(subtotal)}</div>
-                    </div>
-                  </div>
-                </div>
-
-                <button
-                  className="theme-muted rounded-lg p-2 transition hover:bg-[var(--danger-soft)] hover:text-red-500"
-                  onClick={() => removeItem(it.id)}
-                  aria-label="Quitar producto"
-                  title="Quitar producto"
-                >
-                  <Trash2 size={16} />
-                </button>
-              </li>
-            );
-          })
-        )}
-      </ul>
-
-      <div className="theme-border border-t px-4 py-3">
-        <div className="flex items-center justify-between text-sm">
-          <span className="theme-muted">Total</span>
-          <span className="font-semibold">{formatCurrency(total)}</span>
-        </div>
-        <div className="mt-3 flex gap-2">
-          <Link
-            to="/carrito"
-            className="theme-button-secondary flex-1 h-10 inline-flex items-center justify-center cursor-pointer no-underline"
-            onClick={onClose}
-          >
-            Ver carrito
-          </Link>
-          <Link
-            to="/checkout"
-            className="theme-button-primary flex-1 h-10 inline-flex items-center justify-center cursor-pointer no-underline"
-            onClick={onClose}
-          >
-            Comprar
-          </Link>
-        </div>
+      {/* Header */}
+      <div className="flex items-center justify-between border-b border-[var(--border)] px-5 py-4">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.35em] text-[var(--text-main)]">
+          Carrito
+        </p>
         <button
-          onClick={() => {
-            clearCart();
-            onClose();
-          }}
-          className="theme-muted mt-2 w-full text-xs transition hover:text-[var(--accent)]"
+          type="button"
+          onClick={onClose}
+          aria-label="Cerrar carrito"
+          className="text-[var(--text-soft)] transition-opacity hover:opacity-50"
         >
-          Vaciar carrito
+          <X size={14} />
         </button>
       </div>
+
+      {/* Items */}
+      <div className="max-h-[52vh] overflow-y-auto">
+        {items.length === 0 ? (
+          <p className="px-5 py-8 text-center text-xs text-[var(--text-soft)]">
+            Tu carrito está vacío
+          </p>
+        ) : (
+          <ul className="divide-y divide-[var(--border)]">
+            {items.map((it) => {
+              const qty       = it.quantity ?? 1;
+              const unitPrice = getDiscount(it.price ?? 0, Number(it.discountPercentage ?? 0));
+
+              return (
+                <li key={it.id} className="flex gap-4 px-5 py-4">
+                  {/* Imagen */}
+                  <img
+                    src={it.image}
+                    alt={it.title}
+                    className="h-16 w-12 shrink-0 object-cover"
+                  />
+
+                  {/* Info */}
+                  <div className="flex min-w-0 flex-1 flex-col justify-between">
+                    <div>
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[var(--text-soft)]">
+                        {it.categories?.[0]?.name ?? "M4RS"}
+                      </p>
+                      <p className="mt-0.5 truncate text-xs font-medium text-[var(--text-main)]">
+                        {it.title}
+                      </p>
+                      <p className="mt-0.5 text-xs text-[var(--text-soft)]">
+                        {formatCurrency(unitPrice)} c/u
+                      </p>
+                    </div>
+
+                    {/* Cantidad */}
+                    <div className="mt-3 flex items-center justify-between">
+                      <div className="flex items-center border border-[var(--border)]">
+                        <button
+                          type="button"
+                          onClick={() => removeOne(it.id)}
+                          aria-label="Disminuir"
+                          className="flex h-7 w-7 items-center justify-center text-[var(--text-soft)] transition-opacity hover:opacity-50"
+                        >
+                          <Minus size={11} />
+                        </button>
+                        <span className="w-7 text-center text-xs font-medium text-[var(--text-main)]">
+                          {qty}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => addItem(it, 1)}
+                          aria-label="Aumentar"
+                          className="flex h-7 w-7 items-center justify-center text-[var(--text-soft)] transition-opacity hover:opacity-50"
+                        >
+                          <Plus size={11} />
+                        </button>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => removeItem(it.id)}
+                        className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[var(--text-soft)] transition-opacity hover:opacity-50"
+                      >
+                        Quitar
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Subtotal */}
+                  <p className="shrink-0 text-xs font-medium text-[var(--text-main)]">
+                    {formatCurrency(unitPrice * qty)}
+                  </p>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </div>
+
+      {/* Footer */}
+      {items.length > 0 && (
+        <div className="border-t border-[var(--border)] px-5 py-4">
+          {/* Total */}
+          <div className="mb-4 flex items-center justify-between">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.35em] text-[var(--text-soft)]">
+              Total
+            </span>
+            <span className="text-sm font-light text-[var(--text-main)]">
+              {formatCurrency(total)}
+            </span>
+          </div>
+
+          {/* CTAs */}
+          <div className="flex gap-2">
+            <Link
+              to="/carrito"
+              onClick={onClose}
+              className="flex h-9 flex-1 items-center justify-center border border-[var(--border)] text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--text-main)] no-underline transition-opacity hover:opacity-60"
+            >
+              Ver carrito
+            </Link>
+            <Link
+              to="/checkout"
+              onClick={onClose}
+              className="flex h-9 flex-1 items-center justify-center border border-[var(--text-main)] bg-[var(--text-main)] text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--bg-page)] no-underline transition-opacity hover:opacity-80"
+            >
+              Comprar
+            </Link>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => { clearCart(); onClose(); }}
+            className="mt-3 w-full text-center text-[10px] font-semibold uppercase tracking-[0.3em] text-[var(--text-soft)] transition-opacity hover:opacity-50"
+          >
+            Vaciar carrito
+          </button>
+        </div>
+      )}
     </div>
   );
 }

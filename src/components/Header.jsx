@@ -1,19 +1,16 @@
-import React, {
-  useDeferredValue,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import React, { useEffect, useRef, useState } from "react";
+import { MagnifyingGlassIcon, UserIcon } from "@heroicons/react/24/outline";
 import { Link } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { X } from "lucide-react";
-import { createPortal } from "react-dom";
-import { productos } from "../data";
+import { X, Sun } from "lucide-react";
+import { TbAlien } from "react-icons/tb";
 import logo from "../assets/logo3.png";
 import CartButton from "./cart/CartButton";
 import CartDropdown from "./cart/CartDropdown";
+import AuthModal from "./auth/AuthModal";
+import { useProducts } from "../hooks/useProducts";
+import { useTheme } from "../theme/ThemeProvider";
+import { useAuth } from "../context/AuthContext";
 
 const formatCurrency = (value) =>
   new Intl.NumberFormat("es-AR", {
@@ -23,259 +20,234 @@ const formatCurrency = (value) =>
   }).format(value);
 
 export default function Header({ darkOnTop = false }) {
+  const { theme, toggleTheme } = useTheme();
+  const { user, logout } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [authOpen, setAuthOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const deferredQuery = useDeferredValue(query);
   const inputRef = useRef(null);
+  const panelRef = useRef(null);
+  const userMenuRef = useRef(null);
+  const { products } = useProducts();
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > window.innerHeight * 0.2);
-    };
-
+    const handleScroll = () => setIsScrolled(window.scrollY > window.innerHeight * 0.2);
     window.addEventListener("scroll", handleScroll);
     handleScroll();
-
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   useEffect(() => {
     if (!searchOpen) return;
-
-    const timeout = window.setTimeout(() => inputRef.current?.focus(), 120);
-    const previousBodyOverflow = document.body.style.overflow;
-    const previousHtmlOverflow = document.documentElement.style.overflow;
-    const handleEsc = (event) => {
-      if (event.key === "Escape") {
-        setSearchOpen(false);
-      }
-    };
-
-    document.body.style.overflow = "hidden";
-    document.documentElement.style.overflow = "hidden";
+    const timeout = window.setTimeout(() => inputRef.current?.focus(), 80);
+    const handleEsc = (e) => { if (e.key === "Escape") closeSearch(); };
     window.addEventListener("keydown", handleEsc);
-
     return () => {
       window.clearTimeout(timeout);
-      document.body.style.overflow = previousBodyOverflow;
-      document.documentElement.style.overflow = previousHtmlOverflow;
       window.removeEventListener("keydown", handleEsc);
     };
   }, [searchOpen]);
 
-  const searchResults = useMemo(() => {
-    const normalizedQuery = deferredQuery.trim().toLowerCase();
-    if (!normalizedQuery) return productos;
+  // Cierra si se clickea fuera del panel
+  useEffect(() => {
+    if (!searchOpen) return;
+    const handleClick = (e) => {
+      if (panelRef.current && !panelRef.current.contains(e.target)) closeSearch();
+    };
+    window.setTimeout(() => document.addEventListener("mousedown", handleClick), 50);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [searchOpen]);
 
-    return productos.filter((product) => {
-      const haystack = [
-        product.name,
-        product.description,
-        product.categories?.map((category) => category.name).join(" "),
-      ]
-        .filter(Boolean)
-        .join(" ")
-        .toLowerCase();
+  // Cierra menú de usuario si se clickea fuera
+  useEffect(() => {
+    if (!userMenuOpen) return;
+    const handleClick = (e) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target)) setUserMenuOpen(false);
+    };
+    window.setTimeout(() => document.addEventListener("mousedown", handleClick), 50);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [userMenuOpen]);
 
-      return haystack.includes(normalizedQuery);
-    });
-  }, [deferredQuery]);
-
-  const topIconClasses = darkOnTop
-    ? "text-[var(--text-main)] hover:text-[var(--accent)]"
-    : "text-white hover:text-white/80";
-  const iconClasses = isScrolled
-    ? "text-[var(--text-main)] hover:text-[var(--accent)]"
-    : topIconClasses;
-  const logoClasses = isScrolled
-    ? "text-[var(--text-main)]"
-    : darkOnTop
-      ? "text-[var(--text-main)]"
-      : "hidden text-white";
-
-  const handleCloseSearch = () => {
+  const closeSearch = () => {
     setSearchOpen(false);
     setQuery("");
   };
 
-  const searchOverlay =
-    typeof document === "undefined"
-      ? null
-      : createPortal(
-          <AnimatePresence>
-            {searchOpen ? (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="fixed inset-0 z-[999] overflow-y-auto bg-black/55 backdrop-blur-md"
-                onClick={handleCloseSearch}
-              >
-                <motion.div
-                  initial={{ opacity: 0, y: -28, scale: 0.98 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -20, scale: 0.98 }}
-                  transition={{ duration: 0.24, ease: "easeOut" }}
-                  className="theme-panel mx-auto mt-20 mb-8 w-[calc(100%-1.5rem)] max-w-4xl overflow-hidden rounded-[2rem]"
-                  onClick={(event) => event.stopPropagation()}
-                >
-                  <div className="theme-border border-b px-5 py-4 sm:px-6">
-                    <div className="flex items-center gap-3">
-                      <span className="theme-panel-soft grid h-11 w-11 place-items-center rounded-full theme-muted">
-                        <MagnifyingGlassIcon className="h-5 w-5" />
-                      </span>
-                      <input
-                        ref={inputRef}
-                        type="text"
-                        value={query}
-                        onChange={(event) => setQuery(event.target.value)}
-                        placeholder="Buscar productos, categorías o concepto"
-                        className="h-12 flex-1 border-0 bg-transparent text-base text-[var(--text-main)] outline-none placeholder:text-[var(--text-soft)]"
-                      />
-                      <button
-                        type="button"
-                        onClick={handleCloseSearch}
-                        className="theme-panel-soft grid h-11 w-11 place-items-center rounded-full transition hover:border-[var(--accent)] hover:text-[var(--accent)]"
-                        aria-label="Cerrar buscador"
-                      >
-                        <X className="size-5" />
-                      </button>
-                    </div>
-                  </div>
+  const results = query.trim().length < 1
+    ? []
+    : products.filter((p) => {
+        const haystack = [p.name, p.description, ...(p.categories?.map((c) => c.name) ?? [])]
+          .join(" ")
+          .toLowerCase();
+        return haystack.includes(query.trim().toLowerCase());
+      });
 
-                  <div className="grid gap-0 lg:grid-cols-[1.25fr_0.75fr]">
-                    <div className="max-h-[65vh] overflow-auto p-4 sm:p-5">
-                      <div className="mb-4 flex items-center justify-between">
-                        <p className="theme-eyebrow text-xs font-semibold uppercase tracking-[0.28em]">
-                          Resultados
-                        </p>
-                        <p className="theme-muted text-sm">
-                          {searchResults.length} producto{searchResults.length === 1 ? "" : "s"}
-                        </p>
-                      </div>
+  const showResults = searchOpen && query.trim().length > 0;
 
-                      <div className="space-y-3">
-                        {searchResults.length > 0 ? (
-                          searchResults.map((product) => (
-                            <Link
-                              key={product.id}
-                              to={`/producto/${product.id}`}
-                              onClick={handleCloseSearch}
-                              className="theme-panel-soft flex items-center gap-4 rounded-[1.5rem] p-3 text-inherit no-underline transition hover:border-[var(--accent)]"
-                            >
-                              <img
-                                src={product.image}
-                                alt={product.name}
-                                className="h-20 w-20 rounded-[1.2rem] object-cover"
-                              />
-                              <div className="min-w-0 flex-1">
-                                <p className="theme-eyebrow text-xs font-semibold uppercase tracking-[0.24em]">
-                                  {product.categories?.[0]?.name ?? "M4RS"}
-                                </p>
-                                <h3 className="mt-1 truncate text-base font-semibold text-[var(--text-main)]">
-                                  {product.name}
-                                </h3>
-                                <p className="theme-muted mt-1 line-clamp-2 text-sm">
-                                  {product.description}
-                                </p>
-                              </div>
-                              <div className="text-right">
-                                <p className="text-sm font-semibold text-[var(--text-main)]">
-                                  {formatCurrency(product.price)}
-                                </p>
-                              </div>
-                            </Link>
-                          ))
-                        ) : (
-                          <div className="theme-panel-soft rounded-[1.5rem] border border-dashed px-5 py-10 text-center">
-                            <p className="text-sm font-semibold text-[var(--text-main)]">
-                              No encontramos coincidencias
-                            </p>
-                            <p className="theme-muted mt-2 text-sm">
-                              Probá con el nombre del producto o una categoría.
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
+  const iconClasses = isScrolled || darkOnTop
+    ? "text-[var(--text-main)] hover:text-[var(--accent)]"
+    : "text-white hover:text-white/70";
 
-                    <div className="theme-panel-soft theme-border border-t p-5 lg:border-l lg:border-t-0">
-                      <p className="theme-eyebrow text-xs font-semibold uppercase tracking-[0.28em]">
-                        Búsqueda rápida
-                      </p>
-                      <h3 className="mt-3 text-2xl font-semibold tracking-tight text-[var(--text-main)]">
-                        Encontrá la pieza exacta sin salir del flujo.
-                      </h3>
-                      <p className="theme-muted mt-3 text-sm leading-relaxed">
-                        La UI se apoya en `data.js`, así que cada resultado mantiene
-                        la ficha real del producto.
-                      </p>
-
-                      <div className="mt-6 flex flex-wrap gap-2">
-                        {["Fragmento", "Patch", "Shorts", "Accesorios"].map((term) => (
-                          <button
-                            key={term}
-                            type="button"
-                            onClick={() => setQuery(term)}
-                            className="theme-button-secondary rounded-full px-4 py-2 text-sm font-medium"
-                          >
-                            {term}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              </motion.div>
-            ) : null}
-          </AnimatePresence>,
-          document.body
-        );
+  const logoVisible = !searchOpen;
 
   return (
-    <>
+    <div ref={panelRef}>
       <header
         className={`fixed top-0 left-0 w-full z-[120] transition-all duration-500 ${
-          isScrolled ? "shadow-md backdrop-blur-sm" : "bg-transparent"
+          isScrolled ? "shadow-sm backdrop-blur-sm" : "bg-transparent"
         }`}
         style={isScrolled ? { background: "var(--header-bg)" } : undefined}
       >
-        <div
-          className={`flex h-16 items-center justify-center px-6 transition-all duration-500 ${
-            isScrolled ? "text-[var(--text-main)]" : "text-white"
-          }`}
-        >
-          <Link
-            to="/"
-            className={`absolute left-1/2 -translate-x-1/2 mr-10 no-underline transition-all ${logoClasses}`}
-            aria-label="Ir al inicio"
-          >
-            <img src={logo} alt="M4RS" className="w-24 object-contain" />
-          </Link>
+        <div className="flex h-16 items-center px-6">
 
-          <div
-            className={`ml-auto flex items-center gap-3 md:gap-5 ${
-              isScrolled
-                ? "text-[var(--text-main)]"
-                : darkOnTop
-                  ? "text-[var(--text-main)]"
-                  : "text-white"
-            }`}
-          >
+          {/* Logo — se oculta cuando abre el search */}
+          <AnimatePresence>
+            {logoVisible && (
+              <motion.div
+                key="logo"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.15 }}
+                className="absolute left-1/2 -translate-x-1/2"
+              >
+                <Link to="/" aria-label="Ir al inicio">
+                  <img
+                    src={logo}
+                    alt="M4RS"
+                    className={`w-24 object-contain transition-all duration-300 ${
+                      isScrolled || darkOnTop ? "opacity-100" : "opacity-0 pointer-events-none"
+                    }`}
+                    style={{
+                      filter: theme === "light" ? "invert(1)" : "none",
+                    }}
+                  />
+                </Link>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Input de búsqueda — se expande sobre el header */}
+          <AnimatePresence>
+            {searchOpen && (
+              <motion.div
+                key="search-input"
+                initial={{ opacity: 0, width: "60%" }}
+                animate={{ opacity: 1, width: "100%" }}
+                exit={{ opacity: 0, width: "60%" }}
+                transition={{ duration: 0.22, ease: "easeOut" }}
+                className="flex flex-1 items-center gap-3"
+              >
+                <MagnifyingGlassIcon className="h-4 w-4 shrink-0 text-[var(--text-soft)]" />
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Buscar"
+                  className="flex-1 border-0 bg-transparent text-sm tracking-wide text-[var(--text-main)] outline-none placeholder:text-[var(--text-soft)]"
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Acciones — derecha */}
+          <div className="ml-auto flex items-center gap-4">
+            {searchOpen ? (
+              <button
+                type="button"
+                onClick={closeSearch}
+                className="text-[var(--text-soft)] transition hover:text-[var(--text-main)]"
+                aria-label="Cerrar búsqueda"
+              >
+                <X className="size-4" />
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setSearchOpen(true)}
+                className="grid place-items-center bg-transparent"
+                aria-label="Abrir buscador"
+              >
+                <MagnifyingGlassIcon className={`h-5 w-5 cursor-pointer transition ${iconClasses}`} />
+              </button>
+            )}
+
+            {/* Theme switch */}
             <button
               type="button"
-              onClick={() => setSearchOpen(true)}
-              className="grid place-items-center bg-transparent"
-              aria-label="Abrir buscador"
+              onClick={toggleTheme}
+              aria-label={theme === "dark" ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
+              className="relative flex items-center rounded-full border border-[var(--border)] p-1 transition-colors"
+              style={{ background: "var(--bg-soft)" }}
             >
-              <MagnifyingGlassIcon
-                className={`h-5 w-5 cursor-pointer transition ${iconClasses}`}
+              {/* Pill deslizante */}
+              <motion.span
+                className="absolute top-1 left-1 h-6 w-6 rounded-full"
+                style={{ background: "var(--text-main)" }}
+                animate={{ x: theme === "light" ? 0 : 24 }}
+                transition={{ type: "spring", stiffness: 500, damping: 35 }}
               />
+
+              {/* Sol — modo claro */}
+              <span
+                className="relative z-10 flex h-6 w-6 items-center justify-center transition-colors duration-200"
+                style={{ color: theme === "light" ? "var(--bg-page)" : "var(--text-soft)" }}
+              >
+                <Sun className="size-3.5" />
+              </span>
+
+              {/* Alien — modo oscuro */}
+              <span
+                className="relative z-10 flex h-6 w-6 items-center justify-center transition-colors duration-200"
+                style={{ color: theme === "dark" ? "var(--bg-page)" : "var(--text-soft)" }}
+              >
+                <TbAlien style={{ fontSize: "14px" }} />
+              </span>
             </button>
 
-            <div className="relative mt-2 md:mt-1">
+            {/* User icon */}
+            <div className="relative" ref={userMenuRef}>
+              <button
+                type="button"
+                onClick={() => user ? setUserMenuOpen((o) => !o) : setAuthOpen(true)}
+                className={`transition ${iconClasses}`}
+                aria-label={user ? "Menú de usuario" : "Iniciar sesión"}
+              >
+                <UserIcon className="size-5" strokeWidth={1.5} />
+              </button>
+
+              {/* Dropdown para usuario autenticado */}
+              <AnimatePresence>
+                {user && userMenuOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -6 }}
+                    transition={{ duration: 0.15, ease: "easeOut" }}
+                    className="absolute right-0 top-8 min-w-[180px] border border-[var(--border)] p-4"
+                    style={{ background: "var(--bg-page)" }}
+                  >
+                    <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.3em] text-[var(--text-soft)]">
+                      {user.firstName} {user.lastName}
+                    </p>
+                    <p className="mb-4 truncate text-xs text-[var(--text-soft)]">{user.email}</p>
+                    <button
+                      type="button"
+                      onClick={() => { logout(); setUserMenuOpen(false); }}
+                      className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[var(--text-main)] transition-opacity hover:opacity-50"
+                    >
+                      Cerrar sesión
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            <div className="relative">
               <CartButton
                 onClick={() => setCartOpen(true)}
                 className="size-5 pb-1 md:size-7"
@@ -285,9 +257,73 @@ export default function Header({ darkOnTop = false }) {
             </div>
           </div>
         </div>
+
+        {/* Línea divisoria cuando el search está abierto */}
+        <AnimatePresence>
+          {searchOpen && (
+            <motion.div
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
+              exit={{ scaleX: 0 }}
+              transition={{ duration: 0.2 }}
+              className="h-px w-full origin-left bg-[var(--border)]"
+            />
+          )}
+        </AnimatePresence>
       </header>
 
-      {searchOverlay}
-    </>
+      <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} />
+
+      {/* Panel de resultados — cae por debajo del header */}
+      <AnimatePresence>
+        {showResults && (
+          <motion.div
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.18, ease: "easeOut" }}
+            className="fixed top-16 left-0 right-0 z-[119] max-h-[70vh] overflow-y-auto border-b border-[var(--border)]"
+            style={{ background: "var(--header-bg)", backdropFilter: "blur(12px)" }}
+          >
+            {results.length > 0 ? (
+              <ul className="mx-auto max-w-2xl divide-y divide-[var(--border)] px-6">
+                {results.map((product) => (
+                  <li key={product.slug}>
+                    <Link
+                      to={`/producto/${product.slug}`}
+                      onClick={closeSearch}
+                      className="flex items-center gap-5 py-4 text-inherit no-underline transition-opacity hover:opacity-60"
+                    >
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="h-14 w-14 shrink-0 rounded-sm object-cover"
+                      />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[var(--text-soft)]">
+                          {product.categories?.[0]?.name ?? "M4RS"}
+                        </p>
+                        <p className="mt-0.5 truncate text-sm font-medium text-[var(--text-main)]">
+                          {product.name}
+                        </p>
+                      </div>
+                      <p className="shrink-0 text-sm font-medium text-[var(--text-main)]">
+                        {formatCurrency(product.price)}
+                      </p>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div className="mx-auto max-w-2xl px-6 py-10 text-center">
+                <p className="text-xs uppercase tracking-[0.3em] text-[var(--text-soft)]">
+                  Sin resultados para "{query}"
+                </p>
+              </div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }

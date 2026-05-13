@@ -1,23 +1,29 @@
-import { createContext, useContext, useEffect, useMemo } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 const ThemeContext = createContext(null);
 const STORAGE_KEY = "m4rs-theme";
-const LOCKED_THEME = "dark";
+
+function getInitialTheme() {
+  const saved = window.localStorage.getItem(STORAGE_KEY);
+  if (saved === "light" || saved === "dark") return saved;
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
 
 export function ThemeProvider({ children }) {
+  const [theme, setThemeState] = useState(getInitialTheme);
+
   useEffect(() => {
-    document.documentElement.dataset.theme = LOCKED_THEME;
-    document.documentElement.style.colorScheme = LOCKED_THEME;
-    window.localStorage.setItem(STORAGE_KEY, LOCKED_THEME);
-  }, []);
+    document.documentElement.dataset.theme = theme;
+    document.documentElement.style.colorScheme = theme;
+    window.localStorage.setItem(STORAGE_KEY, theme);
+  }, [theme]);
 
   const value = useMemo(
     () => ({
-      theme: LOCKED_THEME,
-      setTheme: () => {},
-      toggleTheme: () => {},
+      theme,
+      toggleTheme: () => setThemeState((t) => (t === "dark" ? "light" : "dark")),
     }),
-    []
+    [theme]
   );
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
@@ -25,10 +31,6 @@ export function ThemeProvider({ children }) {
 
 export function useTheme() {
   const context = useContext(ThemeContext);
-
-  if (!context) {
-    throw new Error("useTheme must be used within ThemeProvider");
-  }
-
+  if (!context) throw new Error("useTheme must be used within ThemeProvider");
   return context;
 }

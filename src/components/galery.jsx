@@ -1,30 +1,60 @@
-import React from "react";
 import { promoGalleryCards } from "../data";
 
 const PromoSection = () => {
-  return (
-    <section className="w-full py-14">
-      <h2 className="mb-3 text-center text-3xl font-bold uppercase text-[var(--text-main)]">
-        Coleccion de imagenes
-      </h2>
-      <p className="theme-muted mx-auto mb-10 max-w-2xl text-center text-sm md:text-base">
-        El mismo universo visual cambia de temperatura según el tema que elijas.
-      </p>
+  const left = [promoGalleryCards[0], promoGalleryCards[2]];
+  const right = [promoGalleryCards[1], promoGalleryCards[3]];
 
-      <div className="mx-auto grid grid-cols-1 gap-6 px-4 md:grid-cols-2">
-        {promoGalleryCards.map((card) => (
-          <article
-            key={card.id}
-            className={`group relative overflow-hidden rounded-[2rem] ${card.className ?? ""}`}
-          >
-            <img
-              src={card.image}
-              alt={card.alt}
-              className={`w-full object-cover ${card.imageClassName ?? "h-[720px] md:h-[1000px]"}`}
-            />
-            {card.overlay ? <div className={`absolute inset-0 ${card.overlay}`} /> : null}
-          </article>
-        ))}
+  return (
+    <section className="px-6 py-20 sm:px-10 lg:px-16">
+
+      {/* Header editorial */}
+      <div className="mb-14 flex items-center justify-between gap-6">
+        <div className="h-px flex-1 bg-[var(--border)]" />
+        <div className="text-center">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.45em] text-[var(--text-soft)]">
+            M4RS
+          </p>
+          <h2 className="mt-1 text-xs font-semibold uppercase tracking-[0.35em] text-[var(--text-main)]">
+            Universo visual
+          </h2>
+        </div>
+        <div className="h-px flex-1 bg-[var(--border)]" />
+      </div>
+
+      {/* Grid asimétrico — columna derecha desplazada */}
+      <div className="mx-auto grid max-w-5xl grid-cols-1 gap-2 md:grid-cols-2">
+
+        {/* Columna izquierda */}
+        <div className="flex flex-col gap-2">
+          {left.map((card, i) => (
+            <div key={i} className="group relative overflow-hidden">
+              <img
+                src={card.image}
+                alt={card.alt}
+                className="aspect-[3/4] w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+              />
+              {card.overlay && (
+                <div className={`pointer-events-none absolute inset-0 ${card.overlay}`} />
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* Columna derecha — desplazada hacia abajo */}
+        <div className="flex flex-col gap-2 md:mt-20">
+          {right.map((card, i) => (
+            <div key={i} className="group relative overflow-hidden">
+              <img
+                src={card.image}
+                alt={card.alt}
+                className="aspect-[3/4] w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+              />
+              {card.overlay && (
+                <div className={`pointer-events-none absolute inset-0 ${card.overlay}`} />
+              )}
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );

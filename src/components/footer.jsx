@@ -1,90 +1,101 @@
+const NAV = [
+  {
+    label: "Colección",
+    links: ["Shorts", "Accesorios", "Novedades", "Galería"],
+  },
+  {
+    label: "Información",
+    links: ["Envíos", "Devoluciones", "Privacidad", "Términos"],
+  },
+];
+
+const SOCIAL = ["Instagram", "TikTok", "YouTube"];
+
 const Footer = () => {
   return (
-    <footer
-      className="mt-16 text-sm"
-      style={{ background: "var(--footer-bg)", color: "var(--footer-text)" }}
-    >
-      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-6 py-12 md:grid-cols-4">
-        <div>
-          <h4 className="mb-4 uppercase tracking-[0.3em] text-[var(--accent)]">
-            Explore
-          </h4>
-          <ul className="space-y-2">
-            {["Hombres", "Mujeres", "Niños", "Estilo de vida", "Noticias", "Galería"].map((item) => (
-              <li key={item}>
-                <a href="#" className="no-underline transition hover:text-[var(--accent)]">
-                  {item}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
+    <footer style={{ background: "var(--footer-bg)", color: "var(--footer-text)" }}>
 
-        <div>
-          <h4 className="mb-4 uppercase tracking-[0.3em] text-[var(--accent)]">
-            Atención
-          </h4>
-          <ul className="space-y-2">
-            {[
-              "Contáctenos",
-              "Envíos",
-              "Política de Devoluciones",
-              "Política de Privacidad",
-              "Política de Cookies",
-              "Términos y Condiciones",
-            ].map((item) => (
-              <li key={item}>
-                <a href="#" className="no-underline transition hover:text-[var(--accent)]">
-                  {item}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
+      {/* Cuerpo principal */}
+      <div className="mx-auto max-w-6xl px-6 pb-16 pt-20 sm:px-10 lg:px-16">
+        <div className="grid grid-cols-1 gap-14 md:grid-cols-[1fr_1fr_1.6fr]">
 
-        <div className="md:col-span-2">
-          <h4 className="mb-4 uppercase tracking-[0.3em] text-[var(--accent)]">
-            Suscribite
-          </h4>
-          <p className="max-w-xl text-[var(--footer-text)]">
-            Recibí lanzamientos, cápsulas y cambios de sistema antes que nadie.
-          </p>
-          <form className="mt-5 flex flex-col gap-3 sm:flex-row">
-            <input
-              type="email"
-              placeholder="Tu email"
-              className="theme-input h-12 flex-1 rounded-full px-5"
-            />
-            <button
-              type="submit"
-              className="theme-button-primary h-12 rounded-full px-6 text-sm font-semibold uppercase tracking-wide"
+          {/* Columnas de nav */}
+          {NAV.map(({ label, links }) => (
+            <div key={label}>
+              <p className="mb-6 text-[10px] font-semibold uppercase tracking-[0.4em] opacity-40">
+                {label}
+              </p>
+              <ul className="space-y-3">
+                {links.map((item) => (
+                  <li key={item}>
+                    <a
+                      href="#"
+                      className="text-sm font-light no-underline opacity-70 transition-opacity hover:opacity-100"
+                    >
+                      {item}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+
+          {/* Newsletter */}
+          <div>
+            <p className="mb-6 text-[10px] font-semibold uppercase tracking-[0.4em] opacity-40">
+              Comunidad
+            </p>
+            <p className="text-sm font-light leading-relaxed opacity-70">
+              Lanzamientos, cápsulas y cambios de sistema antes que nadie.
+            </p>
+            <form
+              className="mt-6"
+              onSubmit={(e) => e.preventDefault()}
             >
-              Suscribirme
-            </button>
-          </form>
+              <div className="flex border-b border-white/20">
+                <input
+                  type="email"
+                  placeholder="Tu email"
+                  className="flex-1 bg-transparent py-3 text-sm font-light outline-none placeholder:opacity-30"
+                  style={{ color: "var(--footer-text)" }}
+                />
+                <button
+                  type="submit"
+                  className="shrink-0 pb-3 pl-4 text-[10px] font-semibold uppercase tracking-[0.3em] opacity-60 transition-opacity hover:opacity-100"
+                >
+                  Suscribir
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
 
-      <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 border-t px-6 py-6 text-xs uppercase md:flex-row">
-        <div className="flex gap-6">
-          <button className="transition hover:text-[var(--accent)]">Español</button>
-          <button className="transition hover:text-[var(--accent)]">ARS$</button>
-        </div>
-        <div className="flex gap-4">
-          <a href="#" className="no-underline transition hover:text-[var(--accent)]">
-            Instagram
-          </a>
-          <a href="#" className="no-underline transition hover:text-[var(--accent)]">
-            TikTok
-          </a>
-          <a href="#" className="no-underline transition hover:text-[var(--accent)]">
-            YouTube
-          </a>
-        </div>
-      </div>
+      {/* Barra inferior */}
+      <div
+        className="mx-auto max-w-6xl px-6 sm:px-10 lg:px-16"
+        style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}
+      >
+        <div className="flex flex-col gap-5 py-6 md:flex-row md:items-center md:justify-between">
 
-      <div className="border-t px-6 py-6 text-center text-xs">
-        © 2025 M4RS
+          {/* Copyright */}
+          <p className="text-[10px] font-semibold uppercase tracking-[0.4em] opacity-30">
+            © 2025 M4RS
+          </p>
+
+          {/* Social */}
+          <div className="flex gap-6">
+            {SOCIAL.map((name) => (
+              <a
+                key={name}
+                href="#"
+                className="text-[10px] font-semibold uppercase tracking-[0.3em] no-underline opacity-40 transition-opacity hover:opacity-100"
+              >
+                {name}
+              </a>
+            ))}
+          </div>
+        </div>
       </div>
     </footer>
   );

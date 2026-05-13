@@ -1,21 +1,20 @@
 import { useCallback, useEffect, useState } from "react";
-import GridIntro from "../components/Intro/Intro";
-import GlitchIntro from "../components/Intro/IntroGlitch";
+import BlackMirrorIntro from "../components/Intro/BlackMirrorIntro";
 import Novedades from "../components/novedades";
 import Footer from "../components/footer";
-import { productos } from "../data";
+import { useProducts } from "../hooks/useProducts";
 import logo from "../../src/assets/logo3.png";
 import PromoSection from "../components/galery";
-import Header from "../components/Header"; 
+import Header from "../components/Header";
 import Starfield from "../components/Starfield";
 
-const INTRO_VARIANT = "glitch";
+const INTRO_VARIANT = "blackmirror";
 const introComponents = {
-  grid: GridIntro,
-  glitch: GlitchIntro,
+  blackmirror: BlackMirrorIntro,
 };
 
 export default function Home() {
+  const { products, loading } = useProducts();
   const [scrolled, setScrolled] = useState(false);
   const [introVisible, setIntroVisible] = useState(false);
   const [introFinished, setIntroFinished] = useState(false);
@@ -87,7 +86,7 @@ export default function Home() {
       </section>
       <main className="theme-page">
         <div>
-          <Novedades productos={productos} />
+          <Novedades productos={products} loading={loading} />
         </div>
         <PromoSection />
         <Footer />

@@ -1,0 +1,186 @@
+.wrapper {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* ── Canvas noise ───────────────────────────────────── */
+.noise {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+}
+
+/* ── Scanlines ──────────────────────────────────────── */
+.scanlines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 3px,
+    rgba(0, 0, 0, 0.18) 3px,
+    rgba(0, 0, 0, 0.18) 4px
+  );
+  z-index: 2;
+}
+
+/* ── Vignette ───────────────────────────────────────── */
+.vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.85) 100%);
+  z-index: 3;
+}
+
+/* ── Content ────────────────────────────────────────── */
+.content {
+  position: relative;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+/* ── Logo container ─────────────────────────────────── */
+.logoContainer {
+  position: relative;
+  width: clamp(10rem, 24vw, 18rem);
+  aspect-ratio: 3 / 2;
+}
+
+.logo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Base */
+.logoMain {
+  position: relative;
+  transition: filter 0.4s ease, opacity 0.4s ease;
+}
+
+/* Canal rojo */
+.logoR {
+  filter: saturate(0) sepia(1) hue-rotate(-30deg) saturate(8) brightness(1.4);
+  mix-blend-mode: screen;
+  opacity: 0.7;
+  transition: transform 0.3s ease, opacity 0.5s ease;
+}
+
+/* Canal azul */
+.logoB {
+  filter: saturate(0) sepia(1) hue-rotate(190deg) saturate(8) brightness(1.4);
+  mix-blend-mode: screen;
+  opacity: 0.7;
+  transition: transform 0.3s ease, opacity 0.5s ease;
+}
+
+/* ── Glitch slices ──────────────────────────────────── */
+.slicesWrap {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.slice {
+  filter: brightness(1.3);
+  opacity: 0;
+  animation: none;
+}
+
+/* ── Tagline ────────────────────────────────────────── */
+.tagline {
+  font-size: clamp(0.6rem, 1.4vw, 0.75rem);
+  letter-spacing: 0.5em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+  text-align: center;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.6s ease 0.1s, transform 0.6s ease 0.1s;
+  white-space: nowrap;
+}
+
+.taglineVisible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Fade exit ──────────────────────────────────────── */
+.exit {
+  animation: exitSignal 0.6s ease forwards;
+}
+
+@keyframes exitSignal {
+  0%   { opacity: 1; filter: brightness(1); }
+  30%  { opacity: 1; filter: brightness(2) contrast(2); }
+  60%  { opacity: 0.6; filter: brightness(0.3); }
+  100% { opacity: 0; filter: brightness(0); pointer-events: none; }
+}
+
+/* ── Slice keyframes (6 bandas) ─────────────────────── */
+@keyframes sliceA {
+  0%, 100% { opacity: 0; transform: translateX(0); }
+  10%       { opacity: 0.9; transform: translateX(-12px); clip-path: inset(8% 0 78% 0); }
+  18%       { opacity: 0; }
+}
+@keyframes sliceB {
+  0%, 100% { opacity: 0; transform: translateX(0); }
+  22%      { opacity: 0.85; transform: translateX(18px); clip-path: inset(22% 0 64% 0); }
+  30%      { opacity: 0; }
+}
+@keyframes sliceC {
+  0%, 100% { opacity: 0; transform: translateX(0); }
+  35%      { opacity: 1; transform: translateX(-8px); clip-path: inset(42% 0 44% 0); }
+  43%      { opacity: 0; }
+}
+@keyframes sliceD {
+  0%, 100% { opacity: 0; transform: translateX(0); }
+  50%      { opacity: 0.8; transform: translateX(22px); clip-path: inset(60% 0 28% 0); }
+  58%      { opacity: 0; }
+}
+@keyframes sliceE {
+  0%, 100% { opacity: 0; transform: translateX(0); }
+  64%      { opacity: 0.95; transform: translateX(-16px); clip-path: inset(75% 0 14% 0); }
+  72%      { opacity: 0; }
+}
+@keyframes sliceF {
+  0%, 100% { opacity: 0; transform: translateX(0); }
+  80%      { opacity: 0.7; transform: translateX(10px); clip-path: inset(15% 0 55% 0); }
+  88%      { opacity: 0; }
+}
+
+.sliceA { animation: sliceA 1.4s steps(2) infinite; }
+.sliceB { animation: sliceB 1.4s steps(2) infinite; }
+.sliceC { animation: sliceC 1.4s steps(2) infinite; }
+.sliceD { animation: sliceD 1.4s steps(2) infinite; }
+.sliceE { animation: sliceE 1.4s steps(2) infinite; }
+.sliceF { animation: sliceF 1.4s steps(2) infinite; }
+
+/* ── RGB drift por fase ─────────────────────────────── */
+@keyframes rgbDriftWide {
+  0%   { transform: translateX(-8px); }
+  50%  { transform: translateX(8px); }
+  100% { transform: translateX(-8px); }
+}
+@keyframes rgbDriftNarrow {
+  0%   { transform: translateX(-2px); }
+  50%  { transform: translateX(2px); }
+  100% { transform: translateX(-2px); }
+}
