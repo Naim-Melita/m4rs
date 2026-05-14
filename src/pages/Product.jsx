@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { Plus, Minus } from "lucide-react";
 import Header from "../components/Header";
 import Footer from "../components/footer";
@@ -44,6 +44,7 @@ export default function ProductPage() {
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
 
+  const navigate = useNavigate();
   const addItem = useCartStore((state) => state.addItem);
 
   useEffect(() => {
@@ -68,23 +69,28 @@ export default function ProductPage() {
     return Math.round(computedPrice / (1 - discount / 100));
   }, [computedPrice, product?.compareAtPrice, product?.discountPercentage]);
 
+  const buildCartItem = () => ({
+    id: hasSizes ? `${product.id}-${selectedSize || "unico"}` : product.id,
+    title: hasSizes
+      ? `${product.name}${selectedSize ? ` — ${selectedSize}` : ""}`
+      : product.name,
+    price: computedPrice,
+    discountPercentage: product.discountPercentage ?? 0,
+    image: activeImage,
+    categories: product.categories,
+  });
+
   const handleAddToCart = () => {
     if (!product) return;
-    addItem(
-      {
-        id: hasSizes ? `${product.id}-${selectedSize || "unico"}` : product.id,
-        title: hasSizes
-          ? `${product.name}${selectedSize ? ` — ${selectedSize}` : ""}`
-          : product.name,
-        price: computedPrice,
-        discountPercentage: product.discountPercentage ?? 0,
-        image: activeImage,
-        categories: product.categories,
-      },
-      quantity
-    );
+    addItem(buildCartItem(), quantity);
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
+  };
+
+  const handleBuyNow = () => {
+    if (!product) return;
+    addItem(buildCartItem(), quantity);
+    navigate("/checkout");
   };
 
   // ── Loading ──────────────────────────────────────────────
@@ -277,7 +283,8 @@ export default function ProductPage() {
               </div>
             )}
 
-            {/* Cantidad + CTA */}
+            {/* Cantidad + CTAs */}
+            <div className="flex flex-col gap-3">
             <div className="flex gap-3">
               <div className="flex items-center border border-[var(--border)]">
                 <button
@@ -326,6 +333,15 @@ export default function ProductPage() {
               >
                 {added ? "Agregado ✓" : "Agregar al carrito"}
               </button>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleBuyNow}
+              className="w-full border border-[var(--text-main)] bg-[var(--text-main)] py-3.5 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--bg-page)] transition-opacity hover:opacity-80"
+            >
+              Comprar ahora
+            </button>
             </div>
 
             {/* Acordeón de detalles */}

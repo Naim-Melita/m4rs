@@ -51,24 +51,30 @@ export default function Header({ darkOnTop = false }) {
     };
   }, [searchOpen]);
 
-  // Cierra si se clickea fuera del panel
+  // Cierra si se toca fuera del panel (mouse + touch)
   useEffect(() => {
     if (!searchOpen) return;
     const handleClick = (e) => {
       if (panelRef.current && !panelRef.current.contains(e.target)) closeSearch();
     };
-    window.setTimeout(() => document.addEventListener("mousedown", handleClick), 50);
-    return () => document.removeEventListener("mousedown", handleClick);
+    const timer = window.setTimeout(() => document.addEventListener("pointerdown", handleClick), 50);
+    return () => {
+      window.clearTimeout(timer);
+      document.removeEventListener("pointerdown", handleClick);
+    };
   }, [searchOpen]);
 
-  // Cierra menú de usuario si se clickea fuera
+  // Cierra menú de usuario si se toca fuera
   useEffect(() => {
     if (!userMenuOpen) return;
     const handleClick = (e) => {
       if (userMenuRef.current && !userMenuRef.current.contains(e.target)) setUserMenuOpen(false);
     };
-    window.setTimeout(() => document.addEventListener("mousedown", handleClick), 50);
-    return () => document.removeEventListener("mousedown", handleClick);
+    const timer = window.setTimeout(() => document.addEventListener("pointerdown", handleClick), 50);
+    return () => {
+      window.clearTimeout(timer);
+      document.removeEventListener("pointerdown", handleClick);
+    };
   }, [userMenuOpen]);
 
   const closeSearch = () => {
@@ -91,8 +97,6 @@ export default function Header({ darkOnTop = false }) {
     ? "text-[var(--text-main)] hover:text-[var(--accent)]"
     : "text-white hover:text-white/70";
 
-  const logoVisible = !searchOpen;
-
   return (
     <div ref={panelRef}>
       <header
@@ -101,62 +105,46 @@ export default function Header({ darkOnTop = false }) {
         }`}
         style={isScrolled ? { background: "var(--header-bg)" } : undefined}
       >
-        <div className="flex h-16 items-center px-6">
+        <div className="relative flex h-16 items-center px-6">
 
-          {/* Logo — se oculta cuando abre el search */}
-          <AnimatePresence>
-            {logoVisible && (
-              <motion.div
-                key="logo"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.15 }}
-                className="absolute left-1/2 -translate-x-1/2"
-              >
-                <Link to="/" aria-label="Ir al inicio">
-                  <img
-                    src={logo}
-                    alt="M4RS"
-                    className={`w-24 object-contain transition-all duration-300 ${
-                      isScrolled || darkOnTop ? "opacity-100" : "opacity-0 pointer-events-none"
-                    }`}
-                    style={{
-                      filter: theme === "light" ? "invert(1)" : "none",
-                    }}
-                  />
-                </Link>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          {/* Logo — centrado en desktop, izquierda en mobile */}
+          <div className={`md:absolute md:left-1/2 md:-translate-x-1/2 transition-opacity duration-300 ${
+            isScrolled || darkOnTop ? "opacity-100" : "opacity-0 pointer-events-none"
+          }`}>
+            <Link to="/" aria-label="Ir al inicio">
+              <img
+                src={logo}
+                alt="M4RS"
+                className="w-24 object-contain"
+                style={{ filter: theme === "light" ? "invert(1)" : "none" }}
+              />
+            </Link>
+          </div>
 
           {/* Input de búsqueda — se expande sobre el header */}
-          <AnimatePresence>
-            {searchOpen && (
-              <motion.div
-                key="search-input"
-                initial={{ opacity: 0, width: "60%" }}
-                animate={{ opacity: 1, width: "100%" }}
-                exit={{ opacity: 0, width: "60%" }}
-                transition={{ duration: 0.22, ease: "easeOut" }}
-                className="flex flex-1 items-center gap-3"
-              >
-                <MagnifyingGlassIcon className="h-4 w-4 shrink-0 text-[var(--text-soft)]" />
-                <input
-                  ref={inputRef}
-                  type="text"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Buscar"
-                  className="flex-1 border-0 bg-transparent text-sm tracking-wide text-[var(--text-main)] outline-none placeholder:text-[var(--text-soft)]"
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Acciones — derecha */}
-          <div className="ml-auto flex items-center gap-4">
-            {searchOpen ? (
+          {searchOpen && (
+            <motion.div
+              key="search-input"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.18 }}
+              className="absolute inset-0 flex items-center gap-3 px-6 z-50"
+              style={{ background: "var(--header-bg)", backdropFilter: "blur(12px)" }}
+            >
+              <MagnifyingGlassIcon className="h-4 w-4 shrink-0 text-[var(--text-soft)]" />
+              <input
+                ref={inputRef}
+                type="text"
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck="false"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Buscar"
+                className="flex-1 border-0 bg-transparent text-sm tracking-wide text-[var(--text-main)] outline-none placeholder:text-[var(--text-soft)]"
+              />
               <button
                 type="button"
                 onClick={closeSearch}
@@ -165,16 +153,22 @@ export default function Header({ darkOnTop = false }) {
               >
                 <X className="size-4" />
               </button>
-            ) : (
-              <button
-                type="button"
-                onClick={() => setSearchOpen(true)}
-                className="grid place-items-center bg-transparent"
-                aria-label="Abrir buscador"
-              >
-                <MagnifyingGlassIcon className={`h-5 w-5 cursor-pointer transition ${iconClasses}`} />
-              </button>
-            )}
+            </motion.div>
+          )}
+
+          {/* Acciones — derecha */}
+          <div className="ml-auto flex items-center gap-4">
+            <button
+              type="button"
+              onClick={() => {
+                setSearchOpen(true);
+                window.setTimeout(() => inputRef.current?.focus(), 50);
+              }}
+              className="grid place-items-center bg-transparent"
+              aria-label="Abrir buscador"
+            >
+              <MagnifyingGlassIcon className={`h-5 w-5 cursor-pointer transition ${iconClasses}`} />
+            </button>
 
             {/* Theme switch */}
             <button
