@@ -31,12 +31,9 @@ export default function Home() {
     document.body.style.overflow = "hidden";
 
     const showTimer = setTimeout(() => setIntroVisible(true), 100);
+    const threshold = document.documentElement.clientHeight - 80;
     const handleScroll = () => {
-      if (window.scrollY > window.innerHeight - 80) {
-        setScrolled(true);
-      } else {
-        setScrolled(false);
-      }
+      setScrolled(window.scrollY > threshold);
     };
 
     handleScroll();
