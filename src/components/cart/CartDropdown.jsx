@@ -3,6 +3,7 @@ import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import useCartStore from "../../hooks/useCarritoStore";
 import { getDiscount } from "../../utils/getDiscount";
+import { useToast } from "../../context/ToastContext";
 
 function formatCurrency(n) {
   return new Intl.NumberFormat("es-AR", {
@@ -15,6 +16,7 @@ function formatCurrency(n) {
 export default function CartDropdown({ open, onClose, anchorRight = true }) {
   const ref = useRef(null);
 
+  const toast     = useToast();
   const items     = useCartStore((s) => s.items ?? []);
   const addItem   = useCartStore((s) => s.addItem);
   const removeOne = useCartStore((s) => s.removeOne);
@@ -177,7 +179,7 @@ export default function CartDropdown({ open, onClose, anchorRight = true }) {
 
           <button
             type="button"
-            onClick={() => { clearCart(); onClose(); }}
+            onClick={() => { clearCart(); onClose(); toast("Carrito vaciado"); }}
             className="mt-3 w-full text-center text-[10px] font-semibold uppercase tracking-[0.3em] text-[var(--text-soft)] transition-opacity hover:opacity-50"
           >
             Vaciar carrito

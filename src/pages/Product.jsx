@@ -1,6 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { Plus, Minus } from "lucide-react";
+import { useToast } from "../context/ToastContext";
+import { Plus, Minus, ZoomIn, ChevronLeft, ChevronRight } from "lucide-react";
+import Lightbox from "yet-another-react-lightbox";
+import Zoom from "yet-another-react-lightbox/plugins/zoom";
+import "yet-another-react-lightbox/styles.css";
 import Header from "../components/Header";
 import Footer from "../components/footer";
 import useCartStore from "../hooks/useCarritoStore";
@@ -44,8 +48,51 @@ export default function ProductPage() {
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
 
+  const [lightboxOpen,  setLightboxOpen]  = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+
+  // Zoom hover — solo desktop
+  const imgRef  = useRef(null);
+  const [zoom, setZoom] = useState({ active: false, x: 50, y: 50 });
+
+  const handleMouseMove = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setZoom({
+      active: true,
+      x: ((e.clientX - rect.left) / rect.width) * 100,
+      y: ((e.clientY - rect.top)  / rect.height) * 100,
+    });
+  };
+  const handleMouseLeave = () => setZoom({ active: false, x: 50, y: 50 });
+
+  // Swipe en mobile
+  const touchStartX = useRef(null);
+  const handleTouchStart = (e) => { touchStartX.current = e.touches[0].clientX; };
+  const handleTouchEnd = (e) => {
+    if (touchStartX.current === null) return;
+    const delta = e.changedTouches[0].clientX - touchStartX.current;
+    touchStartX.current = null;
+    if (Math.abs(delta) < 40) return; // tap, no swipe
+    const imgs = product?.images ?? [];
+    const i    = imgs.indexOf(activeImage);
+    if (delta < 0) setActiveImage(imgs[(i + 1) % imgs.length]);          // swipe izq → siguiente
+    else           setActiveImage(imgs[(i - 1 + imgs.length) % imgs.length]); // swipe der → anterior
+  };
+
+  const openLightbox = (index) => { setLightboxIndex(index); setLightboxOpen(true); };
+
+  const prevImage = () => {
+    const imgs = product?.images ?? [];
+    setActiveImage(imgs[(imgs.indexOf(activeImage) - 1 + imgs.length) % imgs.length]);
+  };
+  const nextImage = () => {
+    const imgs = product?.images ?? [];
+    setActiveImage(imgs[(imgs.indexOf(activeImage) + 1) % imgs.length]);
+  };
+
   const navigate = useNavigate();
-  const addItem = useCartStore((state) => state.addItem);
+  const toast    = useToast();
+  const addItem  = useCartStore((state) => state.addItem);
 
   useEffect(() => {
     if (!product) return;
@@ -74,6 +121,7 @@ export default function ProductPage() {
     title: hasSizes
       ? `${product.name}${selectedSize ? ` — ${selectedSize}` : ""}`
       : product.name,
+    size: hasSizes ? (selectedSize || null) : null,
     price: computedPrice,
     discountPercentage: product.discountPercentage ?? 0,
     image: activeImage,
@@ -83,6 +131,7 @@ export default function ProductPage() {
   const handleAddToCart = () => {
     if (!product) return;
     addItem(buildCartItem(), quantity);
+    toast("Agregado al carrito", { type: "success" });
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
   };
@@ -197,16 +246,93 @@ export default function ProductPage() {
               })}
             </div>
 
-            {/* Imagen principal */}
-            <div className="order-1 aspect-[4/5] w-full overflow-hidden lg:order-2">
-              <img
-                key={activeImage}
-                src={activeImage}
-                alt={product.name}
-                className="h-full w-full object-cover transition-opacity duration-300"
-              />
+            {/* Imagen principal con zoom hover (desktop) y swipe (mobile) */}
+            <div className="order-1 lg:order-2">
+              <div
+                className="group relative aspect-[4/5] w-full overflow-hidden md:cursor-zoom-in"
+                onMouseMove={handleMouseMove}
+                onMouseLeave={handleMouseLeave}
+                onTouchStart={handleTouchStart}
+                onTouchEnd={handleTouchEnd}
+                onClick={() => openLightbox(product.images.indexOf(activeImage))}
+              >
+                <img
+                  ref={imgRef}
+                  key={activeImage}
+                  src={activeImage}
+                  alt={product.name}
+                  className="h-full w-full object-cover"
+                  style={zoom.active ? {
+                    transformOrigin: `${zoom.x}% ${zoom.y}%`,
+                    transform: "scale(1.6)",
+                    transition: "transform 0.1s ease-out",
+                  } : {
+                    transform: "scale(1)",
+                    transition: "transform 0.3s ease-out",
+                  }}
+                />
+
+                {/* Icono lupa — solo desktop */}
+                <div className="pointer-events-none absolute bottom-3 right-3 hidden rounded-full border border-white/30 bg-black/30 p-2 backdrop-blur-sm transition-opacity group-hover:opacity-100 md:block md:opacity-0">
+                  <ZoomIn className="size-3.5 text-white" />
+                </div>
+
+                {/* Flechas — siempre visibles en mobile, hover en desktop */}
+                {product.images.length > 1 && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); prevImage(); }}
+                      className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full border border-white/30 bg-black/40 p-2 backdrop-blur-sm transition-opacity hover:bg-black/60 md:opacity-0 md:group-hover:opacity-100"
+                      aria-label="Imagen anterior"
+                    >
+                      <ChevronLeft className="size-4 text-white" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); nextImage(); }}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full border border-white/30 bg-black/40 p-2 backdrop-blur-sm transition-opacity hover:bg-black/60 md:opacity-0 md:group-hover:opacity-100"
+                      aria-label="Imagen siguiente"
+                    >
+                      <ChevronRight className="size-4 text-white" />
+                    </button>
+                  </>
+                )}
+              </div>
+
+              {/* Indicadores de posición */}
+              {product.images.length > 1 && (
+                <div className="mt-3 flex justify-center gap-1.5">
+                  {product.images.map((img, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => setActiveImage(img)}
+                      className={`h-1 rounded-full transition-all ${
+                        img === activeImage
+                          ? "w-6 bg-[var(--text-main)]"
+                          : "w-1.5 bg-[var(--border)] hover:bg-[var(--text-soft)]"
+                      }`}
+                      aria-label={`Ver imagen ${i + 1}`}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
           </div>
+
+          {/* Lightbox */}
+          <Lightbox
+            open={lightboxOpen}
+            close={() => setLightboxOpen(false)}
+            index={lightboxIndex}
+            slides={product.images.map((src) => ({ src }))}
+            plugins={[Zoom]}
+            zoom={{ maxZoomPixelRatio: 3, scrollToZoom: true }}
+            styles={{
+              container: { backgroundColor: "rgba(0,0,0,0.95)" },
+            }}
+          />
 
           {/* ── Info ──────────────────────────────────────── */}
           <div className="lg:sticky lg:top-24">
@@ -261,13 +387,18 @@ export default function ProductPage() {
                 <div className="flex flex-wrap gap-2">
                   {product.sizes.map((size) => {
                     const isSelected = size === selectedSize;
+                    const variant = product.variants.find((v) => v.size === size);
+                    const outOfStock = variant ? variant.stock === 0 : false;
                     return (
                       <button
                         key={size}
                         type="button"
-                        onClick={() => setSelectedSize(size)}
+                        onClick={() => !outOfStock && setSelectedSize(size)}
+                        disabled={outOfStock}
                         className={`min-w-[52px] border py-2 px-4 text-xs font-medium uppercase tracking-wide transition-colors ${
-                          isSelected
+                          outOfStock
+                            ? "border-[var(--border)] text-[var(--text-soft)] opacity-40 cursor-not-allowed line-through"
+                            : isSelected
                             ? "border-[var(--text-main)] bg-[var(--text-main)] text-[var(--bg-page)]"
                             : "border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--text-main)]"
                         }`}

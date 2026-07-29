@@ -1,4 +1,5 @@
 import api from "./config";
+import { invalidateCache } from "../lib/productsCache";
 
 // ── Imágenes ──────────────────────────────────────────────
 export async function uploadImage(file) {
@@ -23,16 +24,30 @@ export async function getAdminProduct(slug) {
 
 export async function createProduct(payload) {
   const { data } = await api.post("/api/admin/products", payload);
+  invalidateCache();
   return data.product;
 }
 
 export async function updateProduct(slug, payload) {
   const { data } = await api.put(`/api/admin/products/${slug}`, payload);
+  invalidateCache();
   return data.product;
 }
 
 export async function deleteProduct(slug) {
   await api.delete(`/api/admin/products/${slug}`);
+  invalidateCache();
+}
+
+// ── Órdenes ───────────────────────────────────────────────
+export async function getAdminOrders() {
+  const { data } = await api.get("/api/admin/orders");
+  return data.orders;
+}
+
+export async function updateOrderStatus(id, status) {
+  const { data } = await api.patch(`/api/admin/orders/${id}/status`, { status });
+  return data.order;
 }
 
 // ── Usuarios ──────────────────────────────────────────────

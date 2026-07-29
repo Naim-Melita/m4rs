@@ -1,4 +1,9 @@
-// Transforma la respuesta de la API al shape que usan los componentes.
+// Inserta /f_auto,q_auto/ en URLs de Cloudinary para optimizar entrega
+function optimizeUrl(url) {
+  if (!url || !url.includes("res.cloudinary.com")) return url;
+  return url.replace("/upload/", "/upload/f_auto,q_auto/");
+}
+
 export function adaptProduct(p) {
   const sortedImages = [...(p.images ?? [])].sort((a, b) => a.order - b.order);
   const primaryImage = sortedImages.find((i) => i.isPrimary) ?? sortedImages[0];
@@ -7,7 +12,8 @@ export function adaptProduct(p) {
     .map((v) => v.size)
     .filter(Boolean);
 
-  const price = p.variants?.[0]?.price ?? 0;
+  const variantPrices = (p.variants ?? []).map((v) => v.price).filter((n) => n > 0);
+  const price = variantPrices.length ? Math.min(...variantPrices) : 0;
 
   return {
     id: p.slug,
@@ -21,8 +27,8 @@ export function adaptProduct(p) {
     installmentInfo: null,
     stockStatus: null,
     sizes,
-    images: sortedImages.map((i) => i.url),
-    image: primaryImage?.url ?? "",
+    images: sortedImages.map((i) => optimizeUrl(i.url)),
+    image: optimizeUrl(primaryImage?.url ?? ""),
     features: (p.features ?? [])
       .sort((a, b) => a.order - b.order)
       .map((f) => f.text),

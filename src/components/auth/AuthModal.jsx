@@ -2,24 +2,31 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
-import { login, register } from "../../api/auth";
-import { useAuth } from "../../context/AuthContext";
+import { signIn, signUp } from "../../lib/auth";
+import { useToast } from "../../context/ToastContext";
+
+function translateError(msg = "") {
+  const m = msg.toLowerCase();
+  if (m.includes("too many") || m.includes("rate"))               return "Demasiados intentos. Esperá unos minutos.";
+  if (m.includes("password") && m.includes("least"))              return "La contraseña debe tener al menos 8 caracteres.";
+  if (m.includes("user already exists") || m.includes("already")) return "Ya existe una cuenta con ese email.";
+  return "Email o contraseña incorrectos.";
+}
 
 const inputClass =
   "w-full border-b border-[var(--border)] bg-transparent py-3 text-sm text-[var(--text-main)] placeholder:text-[var(--text-soft)] outline-none transition-colors focus:border-[var(--text-main)]";
 
 export default function AuthModal({ open, onClose, onSuccess }) {
-  const [mode, setMode]       = useState("login"); // "login" | "register"
+  const [mode, setMode]       = useState("login");
   const [error, setError]     = useState("");
   const [loading, setLoading] = useState(false);
-  const { setUser }           = useAuth();
   const firstInputRef         = useRef(null);
+  const toast                 = useToast();
 
   const [form, setForm] = useState({
     firstName: "", lastName: "", email: "", password: "",
   });
 
-  // Reset al abrir
   useEffect(() => {
     if (open) {
       setForm({ firstName: "", lastName: "", email: "", password: "" });
@@ -29,7 +36,6 @@ export default function AuthModal({ open, onClose, onSuccess }) {
     }
   }, [open]);
 
-  // Cerrar con Escape
   useEffect(() => {
     if (!open) return;
     const handler = (e) => { if (e.key === "Escape") onClose(); };
@@ -44,15 +50,30 @@ export default function AuthModal({ open, onClose, onSuccess }) {
     e.preventDefault();
     setError("");
     setLoading(true);
+
     try {
-      const user = mode === "login"
-        ? await login({ email: form.email, password: form.password })
-        : await register(form);
-      setUser(user);
-      onSuccess?.(user);
+      if (mode === "login") {
+        const { error: err } = await signIn.email({
+          email:    form.email,
+          password: form.password,
+        });
+        if (err) throw err;
+      } else {
+        const { error: err } = await signUp.email({
+          email:     form.email,
+          password:  form.password,
+          name:      `${form.firstName} ${form.lastName}`.trim(),
+          firstName: form.firstName,
+          lastName:  form.lastName,
+        });
+        if (err) throw err;
+      }
+
+      toast(mode === "login" ? "Sesión iniciada" : "Cuenta creada", { type: "success" });
+      onSuccess?.();
       onClose();
     } catch (err) {
-      setError(err.response?.data?.error ?? "Ocurrió un error. Intentá de nuevo.");
+      setError(translateError(err?.message ?? err?.code ?? ""));
     } finally {
       setLoading(false);
     }
@@ -84,7 +105,6 @@ export default function AuthModal({ open, onClose, onSuccess }) {
             style={{ background: "var(--bg-page)", border: "1px solid var(--border)" }}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Header */}
             <div className="mb-8 flex items-start justify-between">
               <div>
                 <p className="text-[10px] font-semibold uppercase tracking-[0.4em] text-[var(--text-soft)]">
@@ -94,101 +114,61 @@ export default function AuthModal({ open, onClose, onSuccess }) {
                   {mode === "login" ? "Iniciá sesión" : "Creá tu cuenta"}
                 </h2>
               </div>
-              <button
-                type="button"
-                onClick={onClose}
-                className="text-[var(--text-soft)] transition-opacity hover:opacity-50"
-              >
+              <button type="button" onClick={onClose} className="text-[var(--text-soft)] transition-opacity hover:opacity-50">
                 <X className="size-4" />
               </button>
             </div>
 
-            {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-6">
               {mode === "register" && (
                 <div className="grid grid-cols-2 gap-5">
                   <div>
-                    <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.3em] text-[var(--text-soft)]">
-                      Nombre
-                    </p>
-                    <input
-                      ref={firstInputRef}
-                      required
-                      name="firstName"
-                      value={form.firstName}
-                      onChange={handleChange}
-                      className={inputClass}
-                    />
+                    <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.3em] text-[var(--text-soft)]">Nombre</p>
+                    <input ref={firstInputRef} required name="firstName" value={form.firstName} onChange={handleChange} className={inputClass} />
                   </div>
                   <div>
-                    <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.3em] text-[var(--text-soft)]">
-                      Apellido
-                    </p>
-                    <input
-                      required
-                      name="lastName"
-                      value={form.lastName}
-                      onChange={handleChange}
-                      className={inputClass}
-                    />
+                    <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.3em] text-[var(--text-soft)]">Apellido</p>
+                    <input required name="lastName" value={form.lastName} onChange={handleChange} className={inputClass} />
                   </div>
                 </div>
               )}
 
               <div>
-                <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.3em] text-[var(--text-soft)]">
-                  Email
-                </p>
+                <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.3em] text-[var(--text-soft)]">Email</p>
                 <input
                   ref={mode === "login" ? firstInputRef : null}
-                  required
-                  type="email"
-                  name="email"
-                  value={form.email}
-                  onChange={handleChange}
+                  required type="email" name="email"
+                  value={form.email} onChange={handleChange}
                   className={inputClass}
                 />
               </div>
 
               <div>
-                <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.3em] text-[var(--text-soft)]">
-                  Contraseña
-                </p>
+                <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.3em] text-[var(--text-soft)]">Contraseña</p>
                 <input
-                  required
-                  type="password"
-                  name="password"
-                  value={form.password}
-                  onChange={handleChange}
-                  minLength={8}
-                  className={inputClass}
+                  required type="password" name="password"
+                  value={form.password} onChange={handleChange}
+                  minLength={8} className={inputClass}
                 />
               </div>
 
               {error && (
-                <p className="text-xs text-red-400">{error}</p>
+                <p className="border-l-2 border-[var(--text-main)] pl-3 text-[11px] text-[var(--text-soft)]">
+                  {error}
+                </p>
               )}
 
               <button
-                type="submit"
-                disabled={loading}
+                type="submit" disabled={loading}
                 className="w-full border border-[var(--text-main)] bg-[var(--text-main)] py-3.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--bg-page)] transition-opacity hover:opacity-80 disabled:opacity-40"
               >
-                {loading
-                  ? "..."
-                  : mode === "login" ? "Ingresar" : "Crear cuenta"}
+                {loading ? "..." : mode === "login" ? "Ingresar" : "Crear cuenta"}
               </button>
             </form>
 
-            {/* Toggle modo */}
             <p className="mt-6 text-center text-[10px] text-[var(--text-soft)]">
-              {mode === "login" ? "¿No tenés cuenta?" : "¿Ya tenés cuenta?"}
-              {" "}
-              <button
-                type="button"
-                onClick={toggle}
-                className="font-semibold uppercase tracking-wide text-[var(--text-main)] transition-opacity hover:opacity-50"
-              >
+              {mode === "login" ? "¿No tenés cuenta?" : "¿Ya tenés cuenta?"}{" "}
+              <button type="button" onClick={toggle} className="font-semibold uppercase tracking-wide text-[var(--text-main)] transition-opacity hover:opacity-50">
                 {mode === "login" ? "Registrate" : "Ingresá"}
               </button>
             </p>

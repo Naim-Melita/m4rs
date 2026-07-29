@@ -1,8 +1,18 @@
-import { promoGalleryCards } from "../data";
+import galery1 from "../assets/galery1.jpg";
+import galery2 from "../assets/galery2.jpg";
+import galery3 from "../assets/galery3.jpg";
+import galery4 from "../assets/galery4.jpg";
+
+const cards = [
+  { image: galery3, alt: "Look editorial M4RS en composición completa", overlay: "" },
+  { image: galery4, alt: "Look editorial M4RS en composición completa", overlay: "" },
+  { image: galery1, alt: "Look editorial M4RS en primer plano", overlay: "bg-gradient-to-t from-black/80 via-black/20 to-transparent" },
+  { image: galery2, alt: "Look editorial M4RS en composición completa", overlay: "" },
+];
 
 const PromoSection = () => {
-  const left = [promoGalleryCards[0], promoGalleryCards[2]];
-  const right = [promoGalleryCards[1], promoGalleryCards[3]];
+  const left  = [cards[0], cards[2]];
+  const right = [cards[1], cards[3]];
 
   return (
     <section className="px-6 py-20 sm:px-10 lg:px-16">

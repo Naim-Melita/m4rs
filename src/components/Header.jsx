@@ -229,13 +229,22 @@ export default function Header({ darkOnTop = false }) {
                       {user.firstName} {user.lastName}
                     </p>
                     <p className="mb-4 truncate text-xs text-[var(--text-soft)]">{user.email}</p>
-                    <button
-                      type="button"
-                      onClick={() => { logout(); setUserMenuOpen(false); }}
-                      className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[var(--text-main)] transition-opacity hover:opacity-50"
-                    >
-                      Cerrar sesión
-                    </button>
+                    <div className="flex flex-col gap-3">
+                      <Link
+                        to="/mis-pedidos"
+                        onClick={() => setUserMenuOpen(false)}
+                        className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[var(--text-main)] no-underline transition-opacity hover:opacity-50"
+                      >
+                        Mis pedidos
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={() => { logout(); setUserMenuOpen(false); }}
+                        className="text-left text-[10px] font-semibold uppercase tracking-[0.3em] text-[var(--text-soft)] transition-opacity hover:opacity-50"
+                      >
+                        Cerrar sesión
+                      </button>
+                    </div>
                   </motion.div>
                 )}
               </AnimatePresence>

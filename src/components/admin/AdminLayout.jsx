@@ -1,13 +1,14 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { LayoutGrid, Package, Users, LogOut } from "lucide-react";
+import { LayoutGrid, Package, Users, ShoppingBag, LogOut } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useTheme } from "../../theme/ThemeProvider";
 import logo from "../../assets/logo3.png";
 
 const NAV = [
-  { to: "/admin",          label: "Dashboard",  icon: LayoutGrid, end: true },
-  { to: "/admin/productos", label: "Productos",  icon: Package },
-  { to: "/admin/usuarios",  label: "Usuarios",   icon: Users },
+  { to: "/admin",           label: "Dashboard", icon: LayoutGrid, end: true },
+  { to: "/admin/productos", label: "Productos", icon: Package },
+  { to: "/admin/ordenes",   label: "Órdenes",   icon: ShoppingBag },
+  { to: "/admin/usuarios",  label: "Usuarios",  icon: Users },
 ];
 
 export default function AdminLayout() {

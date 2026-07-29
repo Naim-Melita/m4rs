@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { useToast } from "../../context/ToastContext";
 import { ArrowLeft } from "lucide-react";
 import ProductForm from "../../components/admin/ProductForm";
 import { createProduct } from "../../api/admin";
 
 export default function ProductNew() {
   const navigate  = useNavigate();
+  const toast     = useToast();
   const [loading, setLoading] = useState(false);
   const [error,   setError]   = useState(null);
 
@@ -14,6 +16,7 @@ export default function ProductNew() {
     setError(null);
     try {
       await createProduct(data);
+      toast("Producto creado", { type: "success" });
       navigate("/admin/productos");
     } catch (err) {
       setError(err.response?.data?.error ?? "Error al crear el producto");

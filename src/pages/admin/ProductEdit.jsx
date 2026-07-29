@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
+import { useToast } from "../../context/ToastContext";
 import { ArrowLeft, Trash2 } from "lucide-react";
 import ProductForm from "../../components/admin/ProductForm";
 import { getAdminProduct, updateProduct, deleteProduct } from "../../api/admin";
@@ -7,6 +8,7 @@ import { getAdminProduct, updateProduct, deleteProduct } from "../../api/admin";
 export default function ProductEdit() {
   const { slug }   = useParams();
   const navigate   = useNavigate();
+  const toast      = useToast();
 
   const [product,  setProduct]  = useState(null);
   const [fetching, setFetching] = useState(true);
@@ -26,6 +28,7 @@ export default function ProductEdit() {
     setError(null);
     try {
       await updateProduct(slug, data);
+      toast("Producto actualizado", { type: "success" });
       navigate("/admin/productos");
     } catch (err) {
       setError(err.response?.data?.error ?? "Error al guardar el producto");
@@ -39,6 +42,7 @@ export default function ProductEdit() {
     setLoading(true);
     try {
       await deleteProduct(slug);
+      toast("Producto eliminado");
       navigate("/admin/productos");
     } catch (err) {
       setError(err.response?.data?.error ?? "Error al eliminar el producto");

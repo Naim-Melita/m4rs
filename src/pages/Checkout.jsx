@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ShoppingBag } from "lucide-react";
 import Header from "../components/Header";
 import Footer from "../components/footer";
@@ -8,6 +8,8 @@ import useCartStore from "../hooks/useCarritoStore";
 import { getDiscount } from "../utils/getDiscount";
 import { useAuth } from "../context/AuthContext";
 import { updateProfile } from "../api/auth";
+import { createOrder } from "../api/orders";
+import { useToast } from "../context/ToastContext";
 
 // ── MP (comentado hasta terminar integración) ──────────────
 // import PaymentBrick from "../components/checkout/PaymentBrick";
@@ -36,7 +38,9 @@ const Field = ({ label, children }) => (
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function CheckoutPage() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, refreshUser } = useAuth();
+  const toast    = useToast();
+  const navigate = useNavigate();
   const [authOpen, setAuthOpen] = useState(false);
 
   const items    = useCartStore((s) => s.items ?? []);
@@ -102,24 +106,53 @@ export default function CheckoutPage() {
     return lines.join("\n");
   };
 
+  const [submitting, setSubmitting] = useState(false);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (submitting) return;
+    setSubmitting(true);
 
-    // Guardar teléfono y dirección en el perfil
+    let orderId;
+    try {
+      const result = await createOrder({
+        contact,
+        items: items.map((item) => ({
+          title:    item.title,
+          size:     item.size ?? null,
+          quantity: item.quantity ?? 1,
+          unitPrice: getDiscount(item.price ?? 0, Number(item.discountPercentage ?? 0)),
+        })),
+        subtotal,
+        shipping,
+        total,
+        notes: contact.notes,
+      });
+      orderId = result.order.id;
+    } catch {
+      toast("No se pudo guardar el pedido. Intentá de nuevo.", { type: "error" });
+      setSubmitting(false);
+      return;
+    }
+
+    // Guardar datos del perfil y refrescar sesión
     updateProfile({
       firstName: contact.firstName,
       lastName:  contact.lastName,
       phone:     contact.phone,
       address:   contact.address,
-    }).catch(() => {});
+    }).then(() => refreshUser()).catch(() => {});
 
     const message = encodeURIComponent(buildMessage());
-    const url = whatsappNumber
+    const waUrl = whatsappNumber
       ? `https://wa.me/${whatsappNumber}?text=${message}`
       : `https://wa.me/?text=${message}`;
 
+    // Abre WhatsApp en nueva pestaña para no sacar al usuario del sitio
+    window.open(waUrl, "_blank", "noopener,noreferrer");
+
     clearCart();
-    window.location.href = url;
+    navigate(`/pedido-confirmado?id=${orderId}`);
   };
 
   // ── Auth gate ─────────────────────────────────────────────
@@ -285,9 +318,10 @@ export default function CheckoutPage() {
 
             <button
               type="submit"
-              className="block w-full border border-[var(--text-main)] bg-[var(--text-main)] py-4 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--bg-page)] transition-opacity hover:opacity-80"
+              disabled={submitting}
+              className="block w-full border border-[var(--text-main)] bg-[var(--text-main)] py-4 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--bg-page)] transition-opacity hover:opacity-80 disabled:opacity-50"
             >
-              Confirmar pedido vía WhatsApp
+              {submitting ? "Procesando..." : "Confirmar pedido vía WhatsApp"}
             </button>
           </form>
 

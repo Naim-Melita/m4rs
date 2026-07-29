@@ -13,43 +13,59 @@ const introComponents = {
   blackmirror: BlackMirrorIntro,
 };
 
+const INTRO_COOLDOWN_MS = 30 * 60 * 1000; // 30 minutos
+const INTRO_KEY = "m4rs_intro_last_seen";
+
+function shouldShowIntro() {
+  try {
+    const last = localStorage.getItem(INTRO_KEY);
+    if (!last) return true;
+    return Date.now() - Number(last) > INTRO_COOLDOWN_MS;
+  } catch {
+    return true;
+  }
+}
+
+function markIntroSeen() {
+  try { localStorage.setItem(INTRO_KEY, String(Date.now())); } catch {}
+}
+
 export default function Home() {
   const { products, loading } = useProducts();
   const [scrolled, setScrolled] = useState(false);
-  const [introVisible, setIntroVisible] = useState(false);
-  const [introFinished, setIntroFinished] = useState(false);
-  const ActiveIntro = introComponents[INTRO_VARIANT] ?? GridIntro;
+
+  const skipIntro   = !shouldShowIntro();
+  const [introFinished, setIntroFinished] = useState(skipIntro);
+  const ActiveIntro = introComponents[INTRO_VARIANT];
 
   const handleIntroComplete = useCallback(() => {
+    markIntroSeen();
     setIntroFinished(true);
-    // habilitar scroll cuando termina la intro
     document.body.style.overflow = "auto";
   }, []);
 
   useEffect(() => {
-    // bloquear scroll al inicio
-    document.body.style.overflow = "hidden";
+    if (skipIntro) {
+      document.body.style.overflow = "auto";
+    } else {
+      document.body.style.overflow = "hidden";
+    }
 
-    const showTimer = setTimeout(() => setIntroVisible(true), 100);
     const threshold = document.documentElement.clientHeight - 80;
-    const handleScroll = () => {
-      setScrolled(window.scrollY > threshold);
-    };
+    const handleScroll = () => setScrolled(window.scrollY > threshold);
 
     handleScroll();
     window.addEventListener("scroll", handleScroll);
 
     return () => {
-      clearTimeout(showTimer);
       window.removeEventListener("scroll", handleScroll);
-      // restaurar scroll por si se desmonta
       document.body.style.overflow = "auto";
     };
-  }, []);
+  }, [skipIntro]);
 
   return (
     <>
-      <ActiveIntro onComplete={handleIntroComplete} />
+      {!skipIntro && <ActiveIntro onComplete={handleIntroComplete} />}
       <Header />
       <section className="hero">
         <div className="overlay"></div>

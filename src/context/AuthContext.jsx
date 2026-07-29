@@ -1,27 +1,24 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import { getMe, logout as apiLogout } from "../api/auth";
+import { createContext, useContext } from "react";
+import { useSession, signOut } from "../lib/auth";
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [user, setUser]       = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { data: session, isPending, refetch } = useSession();
 
-  // Al montar, verifica si hay sesión activa via cookie
-  useEffect(() => {
-    getMe()
-      .then(setUser)
-      .catch(() => setUser(null))
-      .finally(() => setLoading(false));
-  }, []);
+  const user    = session?.user ?? null;
+  const loading = isPending;
 
   const logout = async () => {
-    await apiLogout();
-    setUser(null);
+    await signOut();
+  };
+
+  const refreshUser = async () => {
+    await refetch();
   };
 
   return (
-    <AuthContext.Provider value={{ user, setUser, logout, loading }}>
+    <AuthContext.Provider value={{ user, loading, logout, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );

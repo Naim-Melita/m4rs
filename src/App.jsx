@@ -13,6 +13,9 @@ import AdminProducts from "./pages/admin/Products";
 import AdminProductNew from "./pages/admin/ProductNew";
 import AdminProductEdit from "./pages/admin/ProductEdit";
 import AdminUsers from "./pages/admin/Users";
+import AdminOrders from "./pages/admin/Orders";
+import OrderConfirmed from "./pages/OrderConfirmed";
+import MyOrders from "./pages/MyOrders";
 import "./index.css";
 
 const App = () => {
@@ -26,7 +29,9 @@ const App = () => {
           <Route path="/producto/:slug" element={<Product />} />
           <Route path="/carrito" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
-          <Route path="/pago"     element={<PaymentResult />} />
+          <Route path="/pago"              element={<PaymentResult />} />
+          <Route path="/pedido-confirmado" element={<OrderConfirmed />} />
+          <Route path="/mis-pedidos"       element={<MyOrders />} />
 
           {/* Admin — protegido por rol */}
           <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
@@ -34,6 +39,7 @@ const App = () => {
             <Route path="productos"           element={<AdminProducts />} />
             <Route path="productos/nuevo"     element={<AdminProductNew />} />
             <Route path="productos/:slug"     element={<AdminProductEdit />} />
+            <Route path="ordenes"             element={<AdminOrders />} />
             <Route path="usuarios"            element={<AdminUsers />} />
           </Route>
         </Routes>
