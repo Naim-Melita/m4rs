@@ -8,6 +8,7 @@ export function AuthProvider({ children }) {
 
   const user    = session?.user ?? null;
   const loading = isPending;
+  const isAdmin = user?.role === "ADMIN";
 
   const logout = async () => {
     await signOut();
@@ -18,7 +19,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, logout, refreshUser }}>
+    <AuthContext.Provider value={{ user, isAdmin, loading, logout, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );

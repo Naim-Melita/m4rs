@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { MagnifyingGlassIcon, UserIcon } from "@heroicons/react/24/outline";
 import { Link } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { X, Sun } from "lucide-react";
+import { X, Sun, ShieldCheck } from "lucide-react";
 import { TbAlien } from "react-icons/tb";
 import logo from "../assets/logo3.png";
 import CartButton from "./cart/CartButton";
@@ -21,7 +21,7 @@ const formatCurrency = (value) =>
 
 export default function Header({ darkOnTop = false }) {
   const { theme, toggleTheme } = useTheme();
-  const { user, logout } = useAuth();
+  const { user, isAdmin, logout } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -226,10 +226,23 @@ export default function Header({ darkOnTop = false }) {
                     style={{ background: "var(--bg-page)" }}
                   >
                     <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.3em] text-[var(--text-soft)]">
-                      {user.firstName} {user.lastName}
+                      {[user.firstName, user.lastName].filter(Boolean).join(" ") || user.name}
                     </p>
                     <p className="mb-4 truncate text-xs text-[var(--text-soft)]">{user.email}</p>
                     <div className="flex flex-col gap-3">
+                      {isAdmin && (
+                        <>
+                          <Link
+                            to="/admin"
+                            onClick={() => setUserMenuOpen(false)}
+                            className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.3em] text-[var(--accent)] no-underline transition-opacity hover:opacity-50"
+                          >
+                            <ShieldCheck className="size-3.5 shrink-0" strokeWidth={2} />
+                            Panel admin
+                          </Link>
+                          <div className="h-px w-full bg-[var(--border)]" />
+                        </>
+                      )}
                       <Link
                         to="/mis-pedidos"
                         onClick={() => setUserMenuOpen(false)}

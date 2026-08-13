@@ -2,11 +2,11 @@ import { Navigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
 export default function AdminRoute({ children }) {
-  const { user, loading } = useAuth();
+  const { isAdmin, loading } = useAuth();
 
   if (loading) return null; // espera a que resuelva la sesión
 
-  if (!user || user.role !== "ADMIN") {
+  if (!isAdmin) {
     return <Navigate to="/" replace />;
   }
 
