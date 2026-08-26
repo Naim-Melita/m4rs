@@ -16,6 +16,7 @@ import AdminUsers from "./pages/admin/Users";
 import AdminOrders from "./pages/admin/Orders";
 import OrderConfirmed from "./pages/OrderConfirmed";
 import MyOrders from "./pages/MyOrders";
+import ResetPassword from "./pages/ResetPassword";
 import "./index.css";
 
 const App = () => {
@@ -32,6 +33,7 @@ const App = () => {
           <Route path="/pago"              element={<PaymentResult />} />
           <Route path="/pedido-confirmado" element={<OrderConfirmed />} />
           <Route path="/mis-pedidos"       element={<MyOrders />} />
+          <Route path="/restablecer-password" element={<ResetPassword />} />
 
           {/* Admin — protegido por rol */}
           <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
