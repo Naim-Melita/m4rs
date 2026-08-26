@@ -14,15 +14,21 @@ function useCanvasNoise(canvasRef, active, intensity = 1) {
     const ctx = canvas.getContext("2d");
     let raf;
 
+    // El viewport puede reportar 0 al montar o durante un cambio de orientación;
+    // createImageData(0, 0) lanza IndexSizeError y tumba toda la app.
     const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      canvas.width  = Math.max(1, window.innerWidth);
+      canvas.height = Math.max(1, window.innerHeight);
     };
     resize();
     window.addEventListener("resize", resize);
 
     const draw = () => {
       const { width, height } = canvas;
+      if (!width || !height) {
+        raf = requestAnimationFrame(draw);
+        return;
+      }
       const img = ctx.createImageData(width, height);
       const d = img.data;
       for (let i = 0; i < d.length; i += 4) {
