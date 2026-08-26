@@ -1,12 +1,12 @@
 import { useRef, useState } from "react";
-import { Plus, Trash2, Upload, Loader } from "lucide-react";
+import { Plus, Trash2, Upload, Loader, ChevronLeft, ChevronRight } from "lucide-react";
 import { uploadImage } from "../../api/admin";
 
 const inputClass =
   "w-full border-b border-[var(--border)] bg-transparent py-2.5 text-sm text-[var(--text-main)] placeholder:text-[var(--text-soft)] outline-none focus:border-[var(--text-main)] transition-colors";
 
-const Label = ({ children }) => (
-  <span className="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.3em] text-[var(--text-soft)]">
+const Label = ({ children, className = "" }) => (
+  <span className={`mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.3em] text-[var(--text-soft)] ${className}`}>
     {children}
   </span>
 );
@@ -60,6 +60,16 @@ export default function ProductForm({ initial = {}, onSubmit, loading }) {
 
   const removeImage = (idx) =>
     set("images", form.images.filter((_, i) => i !== idx));
+
+  // El orden define cuál es la principal (la primera), así que se reordena
+  // con botones: el arrastre no funciona en touch sin una librería de DnD.
+  const moveImage = (idx, dir) => {
+    const next = idx + dir;
+    if (next < 0 || next >= form.images.length) return;
+    const images = [...form.images];
+    [images[idx], images[next]] = [images[next], images[idx]];
+    set("images", images);
+  };
 
   // ── Variantes ─────────────────────────────────────────────
   const addVariant = () =>
@@ -137,19 +147,40 @@ export default function ProductForm({ initial = {}, onSubmit, loading }) {
       <Section title="Imágenes">
         <div className="flex flex-wrap gap-3">
           {form.images.map((url, idx) => (
-            <div key={idx} className="group relative">
-              <img src={url} alt="" className="h-24 w-20 object-cover" />
-              {idx === 0 && (
-                <span className="absolute left-0 top-0 bg-[var(--text-main)] px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-[var(--bg-page)]">
-                  Principal
-                </span>
-              )}
-              <button
-                type="button" onClick={() => removeImage(idx)}
-                className="absolute right-1 top-1 rounded-full bg-black/60 p-0.5 opacity-0 transition-opacity group-hover:opacity-100"
-              >
-                <Trash2 className="size-3 text-white" />
-              </button>
+            <div key={idx} className="group">
+              <div className="relative">
+                <img src={url} alt="" className="h-24 w-20 object-cover" />
+                {idx === 0 && (
+                  <span className="absolute left-0 top-0 bg-[var(--text-main)] px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-[var(--bg-page)]">
+                    Principal
+                  </span>
+                )}
+                <button
+                  type="button" onClick={() => removeImage(idx)}
+                  aria-label="Eliminar imagen"
+                  className="absolute right-1 top-1 rounded-full bg-black/60 p-1.5 opacity-100 transition-opacity md:p-0.5 md:opacity-0 md:group-hover:opacity-100"
+                >
+                  <Trash2 className="size-3 text-white" />
+                </button>
+              </div>
+
+              {/* Reordenar — la primera imagen es la principal */}
+              <div className="flex w-20 border border-t-0 border-[var(--border)]">
+                <button
+                  type="button" onClick={() => moveImage(idx, -1)} disabled={idx === 0}
+                  aria-label="Mover imagen a la izquierda"
+                  className="flex flex-1 items-center justify-center py-1.5 text-[var(--text-soft)] transition-opacity hover:opacity-50 disabled:opacity-20"
+                >
+                  <ChevronLeft className="size-3.5" />
+                </button>
+                <button
+                  type="button" onClick={() => moveImage(idx, 1)} disabled={idx === form.images.length - 1}
+                  aria-label="Mover imagen a la derecha"
+                  className="flex flex-1 items-center justify-center border-l border-[var(--border)] py-1.5 text-[var(--text-soft)] transition-opacity hover:opacity-50 disabled:opacity-20"
+                >
+                  <ChevronRight className="size-3.5" />
+                </button>
+              </div>
             </div>
           ))}
 
@@ -166,35 +197,54 @@ export default function ProductForm({ initial = {}, onSubmit, loading }) {
           </button>
           <input ref={fileRef} type="file" accept="image/*" multiple className="hidden" onChange={handleImageUpload} />
         </div>
-        <p className="mt-2 text-[10px] text-[var(--text-soft)]">La primera imagen es la principal. Arrastrá para reordenar.</p>
+        <p className="mt-2 text-[10px] text-[var(--text-soft)]">La primera imagen es la principal. Usá las flechas para reordenar.</p>
       </Section>
 
       {/* ── Variantes ── */}
       <Section title="Variantes (tallas y precios)">
-        <div className="space-y-3">
-          {form.variants.map((v, idx) => (
-            <div key={idx} className="grid grid-cols-[80px_1fr_1fr_1fr_auto] gap-3 items-end">
-              <label>
-                {idx === 0 && <Label>Talle</Label>}
-                <input value={v.size} onChange={(e) => updateVariant(idx, "size", e.target.value)} placeholder="S" className={inputClass} />
-              </label>
-              <label>
-                {idx === 0 && <Label>Precio (ARS)</Label>}
-                <input type="number" value={v.price} onChange={(e) => updateVariant(idx, "price", e.target.value)} placeholder="0" className={inputClass} />
-              </label>
-              <label>
-                {idx === 0 && <Label>Stock</Label>}
-                <input type="number" value={v.stock} onChange={(e) => updateVariant(idx, "stock", e.target.value)} placeholder="0" className={inputClass} />
-              </label>
-              <label>
-                {idx === 0 && <Label>SKU</Label>}
-                <input value={v.sku} onChange={(e) => updateVariant(idx, "sku", e.target.value)} placeholder="auto" className={inputClass} />
-              </label>
-              <button type="button" onClick={() => removeVariant(idx)} className="pb-2 text-[var(--text-soft)] hover:opacity-50">
-                <Trash2 className="size-4" />
-              </button>
-            </div>
-          ))}
+        {/* Mobile: una tarjeta por variante. Desktop: grilla tipo tabla. */}
+        <div className="space-y-4 md:space-y-3">
+          {form.variants.map((v, idx) => {
+            // En desktop los labels solo van en la primera fila; en mobile, siempre.
+            const labelClass = idx === 0 ? "" : "md:hidden";
+
+            return (
+              <div
+                key={idx}
+                className="grid grid-cols-2 gap-x-4 gap-y-3 border border-[var(--border)] p-4 md:grid-cols-[80px_1fr_1fr_1fr_auto] md:items-end md:gap-3 md:border-0 md:p-0"
+              >
+                <p className="col-span-2 text-[10px] font-semibold uppercase tracking-[0.3em] text-[var(--text-soft)] md:hidden">
+                  Variante {idx + 1}
+                </p>
+
+                <label>
+                  <Label className={labelClass}>Talle</Label>
+                  <input value={v.size} onChange={(e) => updateVariant(idx, "size", e.target.value)} placeholder="S" className={inputClass} />
+                </label>
+                <label>
+                  <Label className={labelClass}>Precio (ARS)</Label>
+                  <input type="number" inputMode="numeric" value={v.price} onChange={(e) => updateVariant(idx, "price", e.target.value)} placeholder="0" className={inputClass} />
+                </label>
+                <label>
+                  <Label className={labelClass}>Stock</Label>
+                  <input type="number" inputMode="numeric" value={v.stock} onChange={(e) => updateVariant(idx, "stock", e.target.value)} placeholder="0" className={inputClass} />
+                </label>
+                <label>
+                  <Label className={labelClass}>SKU</Label>
+                  <input value={v.sku} onChange={(e) => updateVariant(idx, "sku", e.target.value)} placeholder="auto" className={inputClass} />
+                </label>
+
+                <button
+                  type="button"
+                  onClick={() => removeVariant(idx)}
+                  className="col-span-2 flex items-center justify-center gap-2 border border-[var(--border)] py-2.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--text-soft)] transition-opacity hover:opacity-50 md:col-span-1 md:border-0 md:py-0 md:pb-2"
+                >
+                  <Trash2 className="size-4" />
+                  <span className="md:hidden">Eliminar variante</span>
+                </button>
+              </div>
+            );
+          })}
         </div>
         <button type="button" onClick={addVariant} className="mt-4 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.3em] text-[var(--text-soft)] hover:opacity-50">
           <Plus className="size-3.5" /> Agregar variante
@@ -207,7 +257,7 @@ export default function ProductForm({ initial = {}, onSubmit, loading }) {
           {form.features.map((f, idx) => (
             <div key={idx} className="flex items-center gap-3">
               <input value={f} onChange={(e) => updateLine("features", idx, e.target.value)} placeholder="Ej: 100% algodón orgánico" className={`${inputClass} flex-1`} />
-              <button type="button" onClick={() => removeLine("features", idx)} className="text-[var(--text-soft)] hover:opacity-50"><Trash2 className="size-4" /></button>
+              <button type="button" onClick={() => removeLine("features", idx)} aria-label="Eliminar característica" className="shrink-0 p-2 text-[var(--text-soft)] transition-opacity hover:opacity-50"><Trash2 className="size-4" /></button>
             </div>
           ))}
         </div>
@@ -219,11 +269,22 @@ export default function ProductForm({ initial = {}, onSubmit, loading }) {
       {/* ── Composición ── */}
       <Section title="Composición">
         <div className="space-y-2">
+          {/* Mobile: los dos campos apilados, borrar al costado abarcando ambos */}
           {form.composition.map((c, idx) => (
-            <div key={idx} className="grid grid-cols-[1fr_2fr_auto] gap-3 items-center">
+            <div key={idx} className="grid grid-cols-[1fr_auto] items-center gap-x-3 gap-y-2 md:grid-cols-[1fr_2fr_auto] md:gap-3">
               <input value={c.label} onChange={(e) => updateComp(idx, "label", e.target.value)} placeholder="Material" className={inputClass} />
-              <input value={c.value} onChange={(e) => updateComp(idx, "value", e.target.value)} placeholder="100% algodón" className={inputClass} />
-              <button type="button" onClick={() => removeComp(idx)} className="text-[var(--text-soft)] hover:opacity-50"><Trash2 className="size-4" /></button>
+              <input
+                value={c.value} onChange={(e) => updateComp(idx, "value", e.target.value)}
+                placeholder="100% algodón"
+                className={`${inputClass} col-start-1 md:col-start-auto`}
+              />
+              <button
+                type="button" onClick={() => removeComp(idx)}
+                aria-label="Eliminar material"
+                className="col-start-2 row-span-2 row-start-1 p-2 text-[var(--text-soft)] transition-opacity hover:opacity-50 md:col-start-auto md:row-span-1 md:row-start-auto"
+              >
+                <Trash2 className="size-4" />
+              </button>
             </div>
           ))}
         </div>
@@ -238,7 +299,7 @@ export default function ProductForm({ initial = {}, onSubmit, loading }) {
           {form.care.map((c, idx) => (
             <div key={idx} className="flex items-center gap-3">
               <input value={c} onChange={(e) => updateLine("care", idx, e.target.value)} placeholder="Ej: Lavar a mano" className={`${inputClass} flex-1`} />
-              <button type="button" onClick={() => removeLine("care", idx)} className="text-[var(--text-soft)] hover:opacity-50"><Trash2 className="size-4" /></button>
+              <button type="button" onClick={() => removeLine("care", idx)} aria-label="Eliminar cuidado" className="shrink-0 p-2 text-[var(--text-soft)] transition-opacity hover:opacity-50"><Trash2 className="size-4" /></button>
             </div>
           ))}
         </div>

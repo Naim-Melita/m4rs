@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import api from "../../api/config";
+import { AdminPage, PageHeader } from "../../components/admin/AdminPage";
 
 export default function AdminUsers() {
-  const [users, setUsers]   = useState([]);
+  const [users, setUsers]     = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -13,43 +14,50 @@ export default function AdminUsers() {
   }, []);
 
   return (
-    <div className="px-10 py-12">
-      <div className="mb-10">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.4em] text-[var(--text-soft)]">
-          Admin
-        </p>
-        <h1 className="mt-1 text-2xl font-light text-[var(--text-main)]">Usuarios</h1>
-      </div>
+    <AdminPage>
+      <PageHeader title="Usuarios" meta={!loading ? `${users.length} total` : undefined} />
 
       {loading ? (
         <p className="text-xs text-[var(--text-soft)]">Cargando...</p>
       ) : (
         <div className="border-t border-[var(--border)]">
-          {users.map((u) => (
-            <div
-              key={u.id}
-              className="flex items-center gap-6 border-b border-[var(--border)] py-4"
-            >
-              <div className="flex-1">
-                <p className="text-xs font-medium text-[var(--text-main)]">
-                  {u.firstName} {u.lastName}
-                </p>
-                <p className="mt-0.5 text-[10px] text-[var(--text-soft)]">{u.email}</p>
-              </div>
-              <span
-                className={`text-[10px] font-semibold uppercase tracking-[0.25em] ${
-                  u.role === "ADMIN" ? "text-[var(--text-main)]" : "text-[var(--text-soft)]"
-                }`}
+          {users.map((u) => {
+            const fullName =
+              [u.firstName, u.lastName].filter(Boolean).join(" ") || u.name || "—";
+
+            return (
+              <div
+                key={u.id}
+                className="flex items-start gap-4 border-b border-[var(--border)] py-4 md:items-center md:gap-6"
               >
-                {u.role}
-              </span>
-              <p className="text-[10px] text-[var(--text-soft)]">
-                {new Date(u.createdAt).toLocaleDateString("es-AR")}
-              </p>
-            </div>
-          ))}
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-xs font-medium text-[var(--text-main)]">
+                    {fullName}
+                  </p>
+                  <p className="mt-0.5 truncate text-[10px] text-[var(--text-soft)]">{u.email}</p>
+
+                  {/* La fecha baja acá en mobile */}
+                  <p className="mt-1 text-[10px] text-[var(--text-soft)] md:hidden">
+                    Alta {new Date(u.createdAt).toLocaleDateString("es-AR")}
+                  </p>
+                </div>
+
+                <span
+                  className={`shrink-0 text-[10px] font-semibold uppercase tracking-[0.25em] ${
+                    u.role === "ADMIN" ? "text-[var(--text-main)]" : "text-[var(--text-soft)]"
+                  }`}
+                >
+                  {u.role}
+                </span>
+
+                <p className="hidden shrink-0 text-[10px] text-[var(--text-soft)] md:block">
+                  {new Date(u.createdAt).toLocaleDateString("es-AR")}
+                </p>
+              </div>
+            );
+          })}
         </div>
       )}
-    </div>
+    </AdminPage>
   );
 }

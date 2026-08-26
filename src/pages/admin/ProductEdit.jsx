@@ -51,7 +51,7 @@ export default function ProductEdit() {
   };
 
   return (
-    <div className="px-10 py-12">
+    <div className="px-5 py-8 md:px-10 md:py-12">
       {/* Header */}
       <div className="mb-10 flex items-start justify-between">
         <div>
