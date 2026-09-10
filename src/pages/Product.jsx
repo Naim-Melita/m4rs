@@ -56,6 +56,13 @@ export default function ProductPage() {
   const [zoom, setZoom] = useState({ active: false, x: 50, y: 50 });
 
   const handleMouseMove = (e) => {
+    // Los controles viven dentro del contenedor y el evento burbujea: sin esto,
+    // pasar el mouse por una flecha mantiene el zoom y la imagen se corre sola.
+    if (e.target.closest("[data-no-zoom]")) {
+      setZoom((z) => (z.active ? { ...z, active: false } : z));
+      return;
+    }
+
     const rect = e.currentTarget.getBoundingClientRect();
     setZoom({
       active: true,
@@ -283,7 +290,8 @@ export default function ProductPage() {
                     <button
                       type="button"
                       onClick={(e) => { e.stopPropagation(); prevImage(); }}
-                      className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full border border-white/30 bg-black/40 p-2 backdrop-blur-sm transition-opacity hover:bg-black/60 md:opacity-0 md:group-hover:opacity-100"
+                      data-no-zoom
+                      className="absolute left-2 top-1/2 -translate-y-1/2 cursor-pointer rounded-full border border-white/30 bg-black/40 p-2 backdrop-blur-sm transition-opacity hover:bg-black/60 md:opacity-0 md:group-hover:opacity-100"
                       aria-label="Imagen anterior"
                     >
                       <ChevronLeft className="size-4 text-white" />
@@ -291,7 +299,8 @@ export default function ProductPage() {
                     <button
                       type="button"
                       onClick={(e) => { e.stopPropagation(); nextImage(); }}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full border border-white/30 bg-black/40 p-2 backdrop-blur-sm transition-opacity hover:bg-black/60 md:opacity-0 md:group-hover:opacity-100"
+                      data-no-zoom
+                      className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer rounded-full border border-white/30 bg-black/40 p-2 backdrop-blur-sm transition-opacity hover:bg-black/60 md:opacity-0 md:group-hover:opacity-100"
                       aria-label="Imagen siguiente"
                     >
                       <ChevronRight className="size-4 text-white" />

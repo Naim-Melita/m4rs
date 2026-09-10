@@ -80,6 +80,21 @@ a {
   font-weight: 500;
 }
 
+/* Los botones nativos usan cursor: default, así que sin esto no hay señal
+   de que se puedan clickear. Va en @layer base para que las utilidades de
+   Tailwind (cursor-zoom-in, cursor-not-allowed) sigan ganando. */
+@layer base {
+  button:not(:disabled),
+  [role="button"],
+  summary {
+    cursor: pointer;
+  }
+
+  button:disabled {
+    cursor: not-allowed;
+  }
+}
+
 body {
   margin: 0;
   background: var(--bg-page);
