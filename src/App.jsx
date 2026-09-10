@@ -17,6 +17,8 @@ import AdminOrders from "./pages/admin/Orders";
 import OrderConfirmed from "./pages/OrderConfirmed";
 import MyOrders from "./pages/MyOrders";
 import ResetPassword from "./pages/ResetPassword";
+import Universo from "./pages/Universo";
+import AdminGallery from "./pages/admin/Gallery";
 import "./index.css";
 
 const App = () => {
@@ -34,6 +36,7 @@ const App = () => {
           <Route path="/pedido-confirmado" element={<OrderConfirmed />} />
           <Route path="/mis-pedidos"       element={<MyOrders />} />
           <Route path="/restablecer-password" element={<ResetPassword />} />
+          <Route path="/universo"          element={<Universo />} />
 
           {/* Admin — protegido por rol */}
           <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
@@ -42,6 +45,7 @@ const App = () => {
             <Route path="productos/nuevo"     element={<AdminProductNew />} />
             <Route path="productos/:slug"     element={<AdminProductEdit />} />
             <Route path="ordenes"             element={<AdminOrders />} />
+            <Route path="universo"            element={<AdminGallery />} />
             <Route path="usuarios"            element={<AdminUsers />} />
           </Route>
         </Routes>

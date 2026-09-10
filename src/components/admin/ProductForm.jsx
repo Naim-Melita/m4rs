@@ -50,8 +50,10 @@ export default function ProductForm({ initial = {}, onSubmit, loading }) {
     if (!files.length) return;
     setUploading(true);
     try {
-      const urls = await Promise.all(files.map(uploadImage));
-      set("images", [...form.images, ...urls]);
+      // El callback es explícito: map pasa (file, index, array) y el índice
+      // entraría como carpeta de destino.
+      const results = await Promise.all(files.map((file) => uploadImage(file)));
+      set("images", [...form.images, ...results.map((r) => r.url)]);
     } finally {
       setUploading(false);
       e.target.value = "";

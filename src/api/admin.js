@@ -2,13 +2,18 @@ import api from "./config";
 import { invalidateCache } from "../lib/productsCache";
 
 // ── Imágenes ──────────────────────────────────────────────
-export async function uploadImage(file) {
+// Devuelve { url, publicId }. El timeout global de 10s no alcanza para
+// una foto pesada desde una conexión móvil, así que se sube solo acá.
+export async function uploadImage(file, folder) {
   const form = new FormData();
   form.append("image", file);
+  if (folder) form.append("folder", folder);
+
   const { data } = await api.post("/api/admin/upload", form, {
     headers: { "Content-Type": "multipart/form-data" },
+    timeout: 120000,
   });
-  return data.url;
+  return data;
 }
 
 // ── Productos ─────────────────────────────────────────────
@@ -59,4 +64,26 @@ export async function getAdminUsers() {
 export async function updateUserRole(id, role) {
   const { data } = await api.put(`/api/admin/users/${id}/role`, { role });
   return data.user;
+}
+
+// ── Galería (Universo visual) ─────────────────────────────
+export async function getAdminGallery() {
+  const { data } = await api.get("/api/admin/gallery");
+  return data.images;
+}
+
+export async function addGalleryImage(payload) {
+  const { data } = await api.post("/api/admin/gallery", payload);
+  invalidateCache();
+  return data.image;
+}
+
+export async function deleteGalleryImage(id) {
+  await api.delete(`/api/admin/gallery/${id}`);
+  invalidateCache();
+}
+
+export async function reorderGallery(ids) {
+  await api.put("/api/admin/gallery/order", { ids });
+  invalidateCache();
 }

@@ -4,7 +4,7 @@ import Novedades from "../components/novedades";
 import Footer from "../components/footer";
 import { useProducts } from "../hooks/useProducts";
 import logo from "../../src/assets/logo3.png";
-import PromoSection from "../components/galery";
+import UniversoPreview from "../components/UniversoPreview";
 import Header from "../components/Header";
 import Starfield from "../components/Starfield";
 
@@ -101,7 +101,7 @@ export default function Home() {
         <div>
           <Novedades productos={products} loading={loading} />
         </div>
-        <PromoSection />
+        <UniversoPreview />
         <Footer />
       </main>
     </>

@@ -1,11 +1,12 @@
 import { Link } from "react-router-dom";
-import { Package, ShoppingBag, Users } from "lucide-react";
+import { Images, Package, ShoppingBag, Users } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { AdminPage } from "../../components/admin/AdminPage";
 
 const SECTIONS = [
   { label: "Productos", to: "/admin/productos", icon: Package,     desc: "Crear, editar y eliminar productos." },
   { label: "Órdenes",   to: "/admin/ordenes",   icon: ShoppingBag, desc: "Ver pedidos y actualizar su estado." },
+  { label: "Universo",  to: "/admin/universo",  icon: Images,      desc: "Subir y ordenar las imágenes del universo visual." },
   { label: "Usuarios",  to: "/admin/usuarios",  icon: Users,       desc: "Ver y gestionar cuentas de clientes." },
 ];
 

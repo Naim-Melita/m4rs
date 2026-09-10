@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { LayoutGrid, Package, Users, ShoppingBag, LogOut, Menu, X } from "lucide-react";
+import { LayoutGrid, Package, Users, ShoppingBag, Images, LogOut, Menu, X } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useTheme } from "../../theme/ThemeProvider";
 import logo from "../../assets/logo3.png";
@@ -10,6 +10,7 @@ const NAV = [
   { to: "/admin",           label: "Dashboard", icon: LayoutGrid, end: true },
   { to: "/admin/productos", label: "Productos", icon: Package },
   { to: "/admin/ordenes",   label: "Órdenes",   icon: ShoppingBag },
+  { to: "/admin/universo",  label: "Universo",  icon: Images },
   { to: "/admin/usuarios",  label: "Usuarios",  icon: Users },
 ];
 
